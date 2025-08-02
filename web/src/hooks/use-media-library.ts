@@ -1,3 +1,8 @@
+// Legacy hook - use features/media/hooks instead for new code
+export * from '@/features/media/hooks';
+export * from '@/features/media/types';
+
+// Keep existing hook for backward compatibility during migration
 import { useState, useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { IMediaItem, MediaType } from "@/types/media";

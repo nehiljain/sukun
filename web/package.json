@@ -30,6 +30,7 @@
     "@remotion/player": "^4.0.270",
     "@tabler/icons-react": "^3.31.0",
     "@tanstack/react-query": "^5.66.9",
+    "@tanstack/react-query-devtools": "^5.83.0",
     "@tanstack/react-table": "^8.20.5",
     "@types/react-color": "^3.0.13",
     "asciinema-player": "^3.9.0",

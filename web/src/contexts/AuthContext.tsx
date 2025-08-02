@@ -78,7 +78,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const hasPermission = (permission: string) => {
-    return permissions.includes(permission) || user?.is_staff;
+    return permissions.includes(permission) || (user?.is_staff ?? false);
   };
 
   const getActiveOrganization = () => {

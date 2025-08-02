@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Github, ArrowLeft } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import Footer from "@/components/shared/Footer";
 import Navbar from "@/components/shared/Navbar";
 
@@ -10,14 +11,12 @@ export default function LandingPage() {
   const [isValidEmail, setIsValidEmail] = useState(true);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+  const { isAuthenticated } = useAuth();
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch(`${baseUrl}/users`, {
-          credentials: "include",
-        });
-
-        if (response.ok) {
+        if (isAuthenticated) {
           window.location.href = "/dashboard";
         }
       } catch (error) {
@@ -34,10 +33,6 @@ export default function LandingPage() {
 
   const navigateToMarketing = () => {
     window.location.href = "https://demodrive.tech";
-  };
-
-  const navigateToGitHubAuth = () => {
-    window.location.href = "/auth/github";
   };
 
   const navigateToGoogleAuth = () => {
@@ -61,7 +56,7 @@ export default function LandingPage() {
           <div className="max-w-6xl mx-auto px-6">
             <h2 className="text-xl text-secondary-foreground text-center mb-12">
               <p className="text-muted-foreground mt-2 mb-8">
-                We'll sign you in, or create an account if you don't have one
+                We'll sign you in asd sd ssd sds in, or create an account if you don't have one
                 yet.
               </p>
               <div className="flex flex-col gap-4 items-center">

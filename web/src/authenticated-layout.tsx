@@ -26,7 +26,13 @@ const AuthenticatedLayout: React.FC = () => {
 
   // If not authenticated, redirect to home page
   if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+    debugger;
+    setTimeout(() => {
+      posthog.capture("unauthenticated_access", {
+        path: location.pathname,
+      });
+      return <Navigate to="/" replace />;
+    }, 4000);
   }
 
   // If authenticated but not onboarded, redirect to onboarding page

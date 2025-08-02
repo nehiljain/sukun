@@ -1,50 +1,31 @@
-# React + TypeScript + Vite
+# Web Development Setup
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Development with Hot Reloading
 
-Currently, two official plugins are available:
+To run the frontend with hot reloading during development:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. Make sure the Django backend is running (typically on port 8000)
+2. Run the Vite development server:
+   ```bash
+   make fe/dev
+   ```
+   This will start the Vite dev server on port 5173
 
-## Expanding the ESLint configuration
+3. Access your application through the Django server (http://localhost:8000) to benefit from both:
+   - Django backend functionality
+   - Vite hot reloading for frontend changes
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## How It Works
 
-- Configure the top-level `parserOptions` property like this:
+- In development mode (`DEBUG=true`), the Django templates load assets from the Vite dev server (http://localhost:5173)
+- In production, the templates load the built assets from Django's static files
+- CSP headers are adjusted automatically based on the environment
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-});
+## Building for Production
+
+To build the frontend for production:
+```bash
+make fe/build
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from "eslint-plugin-react";
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: "18.3" } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs["jsx-runtime"].rules,
-  },
-});
-```
+This will generate optimized assets in the `static/` directory that Django will serve.

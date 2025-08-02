@@ -17,7 +17,7 @@ const Billing: React.FC = () => {
   const SUBSCRIPTION_PLANS = useSubscriptionPlans();
 
   const stripeBillingUrl =
-    process.env.STRIPE_BILLING_PAGE_URL ||
+    import.meta.env.VITE_STRIPE_BILLING_PAGE_URL ||
     "https://billing.stripe.com/p/login/test_14kcOhgYHd3e5bicMM";
 
   const handleManageSubscription = () => {

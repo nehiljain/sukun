@@ -3,19 +3,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
-import { ChevronRight, PlusIcon, VideoIcon, UserIcon } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { IVideoProject } from "@/types/video-gen";
 import { TemplateDetailsTray } from "@/components/dashboard/TemplateDetailsTray";
 import VerificationBanner from "@/components/auth/VerificationBanner";
 import VideoPreviewTile from "@/components/VideoPreviewTile";
 import VideoTile from "@/components/VideoTile";
 import { ddApiClient } from "@/lib/api-client";
-import CreateRecordingButton from "@/components/video/CreateRecordingButton";
 
 export default function Dashboard() {
   const { user, resendVerificationEmail } = useAuth();
   const [recentProjects, setRecentProjects] = useState<IVideoProject[]>([]);
-  const [templates, setTemplates] = useState<IVideoProject[]>([]);
   const [selectedTemplate, setSelectedTemplate] =
     useState<IVideoProject | null>(null);
   const [isTemplateDetailsOpen, setIsTemplateDetailsOpen] = useState(false);
@@ -32,17 +30,7 @@ export default function Dashboard() {
       }
     };
 
-    const fetchTemplates = async () => {
-      try {
-        const response = await ddApiClient.get("/api/templates/");
-        setTemplates(response.data);
-      } catch (err) {
-        console.error("Error fetching templates:", err);
-      }
-    };
-
     fetchRecentProjects();
-    fetchTemplates();
   }, []);
 
   useEffect(() => {
@@ -55,10 +43,6 @@ export default function Dashboard() {
     assignProjects();
   }, []);
 
-  const handleTemplateClick = (template: IVideoProject) => {
-    setSelectedTemplate(template);
-    setIsTemplateDetailsOpen(true);
-  };
 
   return (
     <div className="flex">
@@ -139,44 +123,6 @@ export default function Dashboard() {
           </Link>
         </div> */}
 
-        {/* Templates Section */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold">
-                Choose a Template to get started
-              </h2>
-              {/* <Link to="/templates">
-                <Button variant="ghost" className="flex items-center gap-2">
-                  View All
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </Link> */}
-            </div>
-
-            {templates.length === 0 ? (
-              <p className="text-muted-foreground text-sm">
-                No templates available
-              </p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
-                {templates.slice(0, 6).map((template) => (
-                  <div
-                    key={template.id}
-                    onClick={() => handleTemplateClick(template)}
-                    className="group cursor-pointer"
-                  >
-                    {template.preview_url ? (
-                      <VideoPreviewTile project={template} showStatus={false} />
-                    ) : (
-                      <VideoTile project={template} />
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
         {/* Recent Projects Section with Thumbnails */}
         <Card>
           <CardContent className="p-6">

@@ -19,7 +19,7 @@ import {
 import { IMediaFile, IVideoProject, IRenderVideo } from "@/types/video-gen";
 
 //Hooks
-import { useVideoProjectState } from "@/components/editor-rve-v6/hooks/use-video-project-state";
+import { useVideoProjectState } from "@/hooks/use-video-project-state";
 import { useAuth } from "@/contexts/AuthContext";
 
 import { Badge } from "@/components/ui/badge";

@@ -4,6 +4,11 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [react()],
+  server: {
+    port: 5173,
+    host: "0.0.0.0",
+    cors: true,
+  },
   build: {
     rollupOptions: {
       input: path.resolve(__dirname, "src/main.tsx"),
