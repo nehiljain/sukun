@@ -1,0 +1,230 @@
+name: CI
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/ci.yaml'
+      - 'app/**'
+      - 'Dockerfile'
+      - 'docker-*.yaml'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - 'Makefile'
+      - 'infra/**'
+  push:
+    branches: [main, sp/ci]
+    paths:
+      - '.github/workflows/ci.yaml'
+      - 'app/**'
+      - 'Dockerfile'
+      - 'docker-*.yaml'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - 'Makefile'
+      - 'infra/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONUNBUFFERED: 1
+      POSTGRES_PASSWORD: very-complex-passwOrd
+      APP_DATABASE_URL: postgresql://postgres:very-complex-passwOrd@127.0.0.1:5432/postgres
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      VITE_REACT_APP_PUBLIC_POSTHOG_KEY: ${{ secrets.VITE_REACT_APP_PUBLIC_POSTHOG_KEY }}
+      VITE_NEXT_PUBLIC_PEXELS_API_KEY: ${{ secrets.VITE_NEXT_PUBLIC_PEXELS_API_KEY }}
+      VITE_REACT_APP_PUBLIC_POSTHOG_HOST: ${{ vars.VITE_REACT_APP_PUBLIC_POSTHOG_HOST }}
+      ENVIRONMENT: staging
+      PROJECT_NAME: demodrive
+      DOCKER_BUILDKIT: 1
+      ENABLE_SIGNALING: false
+      LOCAL_PROCESSING: true
+      AWS_STORAGE_BUCKET_NAME: demodrive-ci
+      AWS_REGION: us-west-1
+      SITE_URL: http://ci.demodrive.tech
+      ADMIN_EMAILS: selvam@demodrive.tech
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Required for the changed-files action to work properly
+
+      - name: Create .env files
+        run: printenv > .env
+
+      # Cache node_modules to speed up builds
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package.json', '**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # Cache Python dependencies
+      - name: Cache Python dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: ${{ runner.os }}-python-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-python-
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 23
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v46
+
+      - name: Check for non-client changes
+        id: check_changes
+        run: |
+          echo "Changed files:"
+          # Convert space-separated list to newline-separated list for better readability
+          echo "${{ steps.changed-files.outputs.all_changed_files }}" | tr ' ' '\n'
+
+          if echo "${{ steps.changed-files.outputs.all_changed_files }} " | tr ' ' '\n' | grep -v "^app/client/" | grep -q "^app/\|^Dockerfile\|^docker-\|^pyproject.toml\|^uv.lock"; then
+            echo "Non-client changes detected, running backend tests"
+            echo "run_backend_tests=true" >> $GITHUB_OUTPUT
+          else
+            echo "Only client changes detected, skipping backend tests"
+            echo "run_backend_tests=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Run frontend and backend builds in parallel
+      - name: Frontend and Backend Setup
+        if:  github.ref == 'refs/heads/sp/ci' || github.ref == 'refs/heads/main' || steps.check_changes.outputs.run_backend_tests == 'true'
+        run: |
+          # Start frontend build in background
+          make fe/build &
+          FRONTEND_PID=$!
+
+          # Set up backend simultaneously
+          echo "Setting up backend..."
+          make setup
+
+          # Wait for frontend install to complete
+          wait $FRONTEND_PID
+
+      - name: Remotion Setup Only
+        run: |
+          make remotion_setup
+
+      - name: Frontend Setup Only
+        if:  github.ref == 'refs/heads/sp/ci' || github.ref == 'refs/heads/main' || steps.check_changes.outputs.run_backend_tests != 'true'
+        run: |
+          make fe/build
+
+      - name: Collect static files
+        if:  github.ref == 'refs/heads/sp/ci' || github.ref == 'refs/heads/main' || steps.check_changes.outputs.run_backend_tests == 'true'
+        run: echo yes |RUNTIME=python make manage COMMAND=collectstatic
+
+      - name: Create postgres container
+        if:   github.ref == 'refs/heads/sp/ci' || github.ref == 'refs/heads/main' || steps.check_changes.outputs.run_backend_tests == 'true'
+        run: make up/db
+
+      - name: Show Database migrations
+        if:  github.ref == 'refs/heads/sp/ci' || github.ref == 'refs/heads/main' || steps.check_changes.outputs.run_backend_tests == 'true'
+        run: |
+          RUNTIME=python make manage COMMAND=showmigrations
+          RUNTIME=python make manage COMMAND=makemigrations
+          RUNTIME=python make manage COMMAND=migrate
+
+      - name: Run backend tests
+        if:  github.ref == 'refs/heads/sp/ci' || github.ref == 'refs/heads/main' || steps.check_changes.outputs.run_backend_tests == 'true'
+        run: |
+          make test
+
+      - name: Code Coverage Summary Report
+        if: steps.check_changes.outputs.run_backend_tests == 'true'
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: coverage.cobertura.xml
+          badge: true
+          fail_below_min: true
+          format: markdown
+          hide_branch_rate: false
+          hide_complexity: true
+          indicators: true
+          output: both
+          thresholds: '30 50'  # Adjust thresholds as needed
+
+      # - name: Add Coverage PR Comment
+      #   uses: marocchino/sticky-pull-request-comment@v2
+      #   if: github.event_name == 'pull_request'
+      #   with:
+      #     recreate: true
+      #     path: code-coverage-results.md
+
+      - name: Configure Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          buildkitd-flags: --debug
+
+      - name: Configure AWS credentials
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/sp/ci'
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_ECR_REGION }}
+
+      - name: Login to Amazon ECR
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/sp/ci'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and push Docker image
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/sp/ci'
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ vars.AWS_ECR_REPOSITORY }}:${{ env.ENVIRONMENT }}-latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ vars.AWS_ECR_REPOSITORY }}:${{ env.ENVIRONMENT }}-${{ github.sha }}
+          cache-from: |
+            type=gha
+            type=registry,ref=${{ steps.login-ecr.outputs.registry }}/${{ vars.AWS_ECR_REPOSITORY }}:${{ env.ENVIRONMENT }}-buildcache
+          cache-to: type=gha,mode=max
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
+          platforms: linux/amd64
+
+      - name: Deploy to staging server
+        if: github.ref == 'refs/heads/sp/ci' || github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/staging.key
+          chmod 600 ~/.ssh/staging.key
+          cat >>~/.ssh/config <<END
+          Host staging
+            HostName $SSH_DEPLOYMENT_HOST
+            User $SSH_DEPLOYMENT_USERNAME
+            IdentityFile ~/.ssh/staging.key
+            StrictHostKeyChecking no
+          END
+          # Copy docker-compose file to server
+          scp docker-compose.server.yaml staging:${{ env.PROJECT_NAME }}_${{ env.ENVIRONMENT }}/
+          scp Makefile staging:${{ env.PROJECT_NAME }}_${{ env.ENVIRONMENT }}/
+
+          # Pull image from ECR and restart service
+          ssh staging 'cd ${{ env.PROJECT_NAME }}_${{ env.ENVIRONMENT }} && \
+            aws ecr get-login-password --region ${{ vars.AWS_ECR_REGION }} | docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }} && \
+            docker pull ${{ steps.login-ecr.outputs.registry }}/${{ vars.AWS_ECR_REPOSITORY }}:${{ env.ENVIRONMENT }}-${{ github.sha }} && \
+            docker tag ${{ steps.login-ecr.outputs.registry }}/${{ vars.AWS_ECR_REPOSITORY }}:${{ env.ENVIRONMENT }}-${{ github.sha }} ${{ env.PROJECT_NAME }}_${{ env.ENVIRONMENT }}:latest && \
+            docker compose -f docker-compose.server.yaml --project-name ${{ env.PROJECT_NAME }}_${{ env.ENVIRONMENT }} run --rm web python app/manage.py migrate && \
+            sudo systemctl daemon-reload && \
+            sudo systemctl restart web_${{ env.PROJECT_NAME }}_${{ env.ENVIRONMENT }}.service'
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_DEPLOYMENT_HOST: ${{ vars.SSH_DEPLOYMENT_HOST }}
+          SSH_DEPLOYMENT_USERNAME: ${{ vars.SSH_DEPLOYMENT_USERNAME }}
+
+      - name: Cleanup
+        if: always()
+        run: make down

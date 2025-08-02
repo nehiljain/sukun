@@ -1,0 +1,82 @@
+{% extends "admin/base_site.html" %} {% load static %} {% block extrastyle %} {{
+block.super }}
+<!-- <link rel="stylesheet" href="https://unpkg.com/stackedit-css@1.0.2/dist/stackedit.min.css"> -->
+<script src="https://cdn.tailwindcss.com"></script>
+{% endblock %} {% block content %}
+<h2>Custom Newsletter Admin</h2>
+
+{% for form in forms %}
+<form method="post" id="form-{{ forloop.counter }}">
+  {% csrf_token %} {{ form.user_id.label_tag }} {{ form.user_id }} {{
+  form.published_date.label_tag }} {{ form.published_date }} {{
+  form.content.label_tag }} {{ form.content }}
+  <input
+    type="button"
+    class="open-editor"
+    value="Open"
+    data-form-id="{{ forloop.counter }}"
+  />
+  <input type="submit" value="Save" />
+</form>
+<br />
+{% endfor %}
+<script src="https://unpkg.com/stackedit-js@1.0.7/docs/lib/stackedit.min.js"></script>
+<script>
+  // const el = document.querySelector('#id_content');
+  // const stackedit = new Stackedit();
+
+  // // Initialize editor with content from the database
+  // el.innerHTML = "{{ form.content.value | default_if_none:'' | safe }}";
+
+  // document.querySelector("#open-editor").addEventListener("click", function(params) {
+  //         // Open the iframe
+  //     stackedit.openFile({
+  //         name: 'Filename',
+  //         content: {
+  //             text: el.value
+  //         }
+  //     },false);
+  // })
+
+  // stackedit.on('fileChange', (file) => {
+  //     el.value = file.content.text;
+  // });
+
+  // document.querySelector('form').addEventListener('submit', () => {
+  //     stackedit.close();
+  // });
+  document.addEventListener("DOMContentLoaded", function () {
+    const forms = document.querySelectorAll('form[id^="form-"]');
+    forms.forEach((form, index) => {
+      const formId = index + 1;
+      const contentEl = form.querySelector("#id_content");
+      const openEditorBtn = form.querySelector(".open-editor");
+      const stackedit = new Stackedit();
+
+      // Initialize editor with content from the database
+      contentEl.innerHTML = contentEl.value || "";
+
+      openEditorBtn.addEventListener("click", function () {
+        // Open the iframe
+        stackedit.openFile(
+          {
+            name: "Filename",
+            content: {
+              text: contentEl.value,
+            },
+          },
+          false
+        );
+      });
+
+      stackedit.on("fileChange", (file) => {
+        contentEl.value = file.content.text;
+      });
+
+      form.addEventListener("submit", () => {
+        stackedit.close();
+      });
+    });
+  });
+</script>
+{% endblock %}

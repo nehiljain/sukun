@@ -1,0 +1,74 @@
+on:
+  release:
+    types: [created, edited]
+name: CD
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONUNBUFFERED: 1
+      ENVIRONMENT: prod
+      PROJECT_NAME: demodrive
+
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - name: Create SSH Config
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/staging.key
+          chmod 600 ~/.ssh/staging.key
+          cat >>~/.ssh/config <<END
+          Host staging
+            HostName $SSH_DEPLOYMENT_HOST
+            User $SSH_DEPLOYMENT_USERNAME
+            IdentityFile ~/.ssh/staging.key
+            StrictHostKeyChecking no
+          END
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_DEPLOYMENT_HOST: ${{ vars.SSH_DEPLOYMENT_HOST }}
+          SSH_DEPLOYMENT_USERNAME: ${{ vars.SSH_DEPLOYMENT_USERNAME }}
+
+      - name: Promote image to production
+        run: |
+          ssh staging 'cd ${{ env.PROJECT_NAME }}_${{ env.ENVIRONMENT }} && \
+            docker tag ${{ env.PROJECT_NAME }}_${{ env.ENVIRONMENT }}:latest ${{ env.PROJECT_NAME }}_${{ env.ENVIRONMENT }}:old && \
+             docker tag ${{ env.PROJECT_NAME}}_staging:latest ${{ env.PROJECT_NAME }}_${{ env.ENVIRONMENT }}:latest'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_ECR_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Push latest tag to ECR
+        run: |
+          ssh staging 'aws ecr get-login-password --region ${{ vars.AWS_ECR_REGION }} | docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }} && \
+          docker tag ${{ env.PROJECT_NAME}}_staging:latest ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.AWS_ECR_REPOSITORY }}:latest && \
+          docker push ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.AWS_ECR_REPOSITORY }}:latest'
+
+      - name: Run migrations in Server
+        run: |
+          ssh staging 'cd ${{ env.PROJECT_NAME }}_${{ env.ENVIRONMENT }} && docker compose -f docker-compose.server.yaml --project-name ${{ env.PROJECT_NAME }}_${{ env.ENVIRONMENT }} run --rm web python app/manage.py migrate'
+
+      - name: Restart service in Server
+        run: |
+          ssh staging 'sudo systemctl daemon-reload && sudo systemctl restart web_${{ env.PROJECT_NAME }}_${{ env.ENVIRONMENT }}.service'
+
+      - name: Run tests in Server
+        run: |
+            ssh staging 'aws ecr get-login-password --region ${{ vars.AWS_ECR_REGION }} | docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }} && \
+            docker tag ${{ env.PROJECT_NAME}}_staging:latest ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.AWS_ECR_REPOSITORY }}:${{ env.ENVIRONMENT }}-latest && \
+            docker push ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.AWS_ECR_REPOSITORY }}:${{ env.ENVIRONMENT }}-latest'
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -rf ~/.ssh/staging.key

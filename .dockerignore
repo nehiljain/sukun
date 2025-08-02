@@ -1,0 +1,8 @@
+fly.toml
+.git/
+*.sqlite3
+.venv
+node_modules
+video_processing/
+langgraph-agent/
+infra/

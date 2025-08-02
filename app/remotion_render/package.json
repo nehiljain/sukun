@@ -1,0 +1,17 @@
+{
+  "name": "remotion-render",
+  "version": "1.0.0",
+  "description": "Render videos using Remotion",
+  "type": "module",
+  "scripts": {
+    "render": "node render.mjs"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.270",
+    "@remotion/renderer": "4.0.270",
+    "axios": "^1.6.2",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "yargs": "^17.7.2"
+  }
+}

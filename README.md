@@ -27,7 +27,9 @@ App Features:
 
 Ops and Infra Features:
 - Continuous deployment (Github)
+- PostHog Analytics
 - Notebook <> DB Integration
+- Frontend Hot Reloading
 - TBD
 
 ## Prerequisites
@@ -53,9 +55,13 @@ Following SaaS services are needed to operate this:
 
    ```sh
    make setup
-   make dev
+   make up
    ```
-4. App is running at http://localhost:8000/
+4. (Optional) Start the frontend development server with hot reloading:
+   ```sh
+   make fe/dev
+   ```
+5. App is running at http://localhost:8000/
 
 ## Deployment
 
