@@ -66,7 +66,7 @@ urlpatterns += [
     # Include app-specific URLs
     path("", include("releases.urls")),
     path("", include("video_gen.urls")),
-    path("", include("sound_gen.urls")),
+    # path("", include("sound_gen.urls")),
     path("", include("user_org.urls")),
     # Catch-all route - must be last
     re_path(r".*", app_noauth_page, name="app"),

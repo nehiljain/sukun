@@ -2,14 +2,13 @@
 # or keep it minimal if you want tooling compatibility
 
 [project]
-name = "moso"
+name = "gestral"
 version = "0.1.0"
 description = ""
 readme = "README.md"
 requires-python = ">=3.10, <3.13"
 authors = [
     {name = "Selvam Palanimalai"},
-    {name = "Nehil Jain"}
 ]
 
 # Dependencies listed for documentation purposes
@@ -75,7 +74,7 @@ dependencies = [
     "drf-spectacular>=0.28.0",
     "lumaai>=1.12.0",
     "boto3>=1.37.25",
-    "celery[sqlalchemy,sqs]>=5.5.0",
+    "celery[sqlalchemy,sqs,redis]>=5.5.0",
     "stripe>=11.6.0",
     "pillow-heif>=0.22.0",
     "beautifulsoup4>=4.13.3",
@@ -85,6 +84,7 @@ dependencies = [
     "pillow-avif-plugin>=1.5.2",
     "assemblyai>=0.40.2",
     "pinecone>=7.3.0",
+    "redis>=5.2.0",
 ]
 
 [project.optional-dependencies]

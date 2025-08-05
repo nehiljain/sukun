@@ -18,19 +18,20 @@ This is an opnionated version of [Shipfast](https://shipfa.st/). More details ab
 ## Features
 
 App Features:
-- RESTFul API backend
-- Simple Frontend Stack - Vite.js, React.
-- Email Flows
-- Authentication (Google)
-- Stripe Integration for Subscriptions
-- Async Job Queues
+- [x] RESTFul API backend with Swagger docs.
+- [x] Simple Frontend Stack - Vite.js, React.
+- [x] Email Flows
+- [x] Authentication (Google)
+- [x] Stripe Integration for Subscriptions
+- [x] Async Job Queues with Celery
 
 Ops and Infra Features:
-- Continuous deployment (Github)
-- PostHog Analytics
-- Notebook <> DB Integration
-- Frontend Hot Reloading
-- TBD
+- [x] Continuous deployment (Github)
+- [x] PostHog Analytics
+- [x] Notion <> DB Integration
+- [x] Frontend Hot Reloading
+- [ ] Deployment to Fly.io
+- [ ] Deployment to AWS Fargate
 
 ## Prerequisites
 
@@ -54,8 +55,7 @@ Following SaaS services are needed to operate this:
 3. Build and Deploy app.
 
    ```sh
-   make setup
-   make up
+   make dev/up
    ```
 4. (Optional) Start the frontend development server with hot reloading:
    ```sh
@@ -63,7 +63,7 @@ Following SaaS services are needed to operate this:
    ```
 5. App is running at http://localhost:8000/
 
-## Deployment
+## Deployment (WIP)
 
 This application can be deployed in 3 ways:
 1. Self Managed VM (AWS, GCP, OVHCloud )

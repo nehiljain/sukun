@@ -102,3 +102,5 @@ generated_videos/
 infra/**/.terraform/
 infra/**/.terraform.lock.hcl
 infra/ami-builder/output/
+
+failed_uploads/

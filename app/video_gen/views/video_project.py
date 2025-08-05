@@ -138,6 +138,7 @@ class VideoProjectViewSet(viewsets.ModelViewSet):
         """Update the status of a video asset"""
         try:
             video_project = self.get_object()
+
             new_status = request.data.get("status")
 
             if new_status not in [choice[0] for choice in RenderVideo.Status.choices]:

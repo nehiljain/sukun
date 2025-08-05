@@ -144,19 +144,3 @@ def convert_heic_to_png_file(file: SimpleUploadedFile) -> SimpleUploadedFile:
         logger.error(f"Failed to convert HEIC file: {file.name} {e}")
         return None
 
-
-# Example usage (optional, for testing):
-# if __name__ == '__main__':
-#     try:
-#         with open('path/to/your/image.heic', 'rb') as heic_file:
-#             png_data_buffer = convert_heic_to_png(heic_file)
-#             if png_data_buffer:
-#                 with open('output_image.png', 'wb') as png_file:
-#                     png_file.write(png_data_buffer.read())
-#                 print("Conversion successful, saved as output_image.png")
-#             else:
-#                 print("Conversion failed.")
-#     except FileNotFoundError:
-#         print("Error: Input HEIC file not found.")
-#     except Exception as e:
-#         print(f"An error occurred: {e}")

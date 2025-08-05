@@ -64,10 +64,7 @@ INSTALLED_APPS = [
     "jsoneditor",
     "django_seed",
     "video_gen",
-    "sound_gen",
     "django_celery_results",
-    # "tourify",
-    # "releases.apps.ReleasesConfig",
 ]
 
 MIDDLEWARE = [
@@ -277,7 +274,8 @@ FALLBACK_BASE_URL = os.environ.get("FALLBACK_BASE_URL")
 CELERY_RESULT_BACKEND = "django-db"
 CELERY_CACHE_BACKEND = "django-cache"
 CELERY_RESULT_EXTENDED = True
-# If SQS is specified as the broker, configure it according to documentation
+
+# Configure broker based on environment
 if os.environ.get("BROKER_TYPE") == "sqs":
     # Simple approach: just use sqs:// and let Celery use AWS_ACCESS_KEY_ID and
     # AWS_SECRET_ACCESS_KEY environment variables automatically
@@ -294,6 +292,9 @@ if os.environ.get("BROKER_TYPE") == "sqs":
 
     # Default queue name
     CELERY_TASK_DEFAULT_QUEUE = os.environ.get("SQS_QUEUE_NAME", "render-jobs-dev")
+else:
+    # Default to Redis for development
+    CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://redis:6379/0")
 
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"

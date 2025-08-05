@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from blogchecker_service.llm_utils import MODEL_4OMINI, call_openai_api_with_structure
+from common.llm_utils import MODEL_4OMINI, call_openai_api_with_structure
 from django.db import models
 from pydantic import BaseModel
 from releases.models import AppUser

@@ -1,12 +1,47 @@
 services:
+  # Development web service with code mounting
   web:
-    build: .
+    build:
+      context: .
+      target: development
+      cache_from:
+        - ${PROJECT_NAME:-gestral}:dev-cache
     ports:
-      - "8001:8000"
+      - "8000:8000"
     volumes:
-      - ./.env:/opt/django/.env
-    profiles: ["web"]
+      # Mount source code for hot reloading
+      - ./app:/app:cached
+      - ./.env:/app/.env:ro
+      # Cache Python packages to speed up rebuilds
+      - python-packages:/app/.venv
+    environment:
+      - DJANGO_SETTINGS_MODULE=settings
+      - DEBUG=1
+      - PYTHONPATH=/app
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: ["web", "dev"]
+    restart: unless-stopped
 
+  # Production-like web service (for testing production builds locally)
+  web-prod:
+    build:
+      context: .
+      target: production
+    ports:
+      - "8002:8000"
+    volumes:
+      - ./.env:/app/.env:ro
+    environment:
+      - DJANGO_SETTINGS_MODULE=settings
+      - DEBUG=0
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: ["prod"]
+
+  # Database service
   db:
     image: pgvector/pgvector:pg16
     restart: always
@@ -25,29 +60,74 @@ services:
       POSTGRES_DB: ${PROJECT_NAME}
       POSTGRES_EXTENSIONS: uuid-ossp, pg_trgm
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
-      interval: 1s
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U postgres"]
+      interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 10s
     ports:
-      - 5433:5432
+      - "5433:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/${PROJECT_NAME}
-      - ./db_scripts/:/docker-entrypoint-initdb.d/
-    profiles: ["db"]
+      - pgdata:/var/lib/postgresql/data
+      - ./configs/db_scripts/:/docker-entrypoint-initdb.d/:ro
+    profiles: ["db", "dev", "prod"]
 
+  # Database admin interface
   pgadmin:
     image: dpage/pgadmin4:9.5
-    restart: always
+    restart: unless-stopped
     ports:
       - "8889:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@${PROJECT_NAME}.com
+      PGADMIN_DEFAULT_EMAIL: admin@${PROJECT_NAME:-gestral}.com
       PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
     profiles: ["debug"]
     volumes:
       - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Redis for caching and session storage
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    profiles: ["cache", "dev", "prod"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Celery worker for background tasks
+  celery:
+    build:
+      context: .
+      target: development
+    command: celery -A celeryapp worker --loglevel=info --concurrency=2
+    volumes:
+      - ./app:/app:cached
+      - ./.env:/app/.env:ro
+      - python-packages:/app/.venv
+    environment:
+      - DJANGO_SETTINGS_MODULE=settings
+      - PYTHONPATH=/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    profiles: ["celery", "dev"]
+    restart: unless-stopped
 
 volumes:
   pgdata:
   pgadmin-data:
+  redis-data:
+  python-packages:
