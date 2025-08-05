@@ -104,3 +104,4 @@ infra/**/.terraform.lock.hcl
 infra/ami-builder/output/
 
 failed_uploads/
+infra/

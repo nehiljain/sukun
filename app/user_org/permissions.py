@@ -1,6 +1,6 @@
 from rest_framework import permissions
 
-from releases.models import AppUser
+from user_org.models import AppUser
 
 
 class IsAppUser(permissions.BasePermission):

@@ -1,5 +1,6 @@
 import uuid
 
+from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -9,12 +10,53 @@ from django.dispatch import receiver
 # Create your models here.
 
 
+class AppUser(models.Model):
+    COMPANY_ROLE_CHOICES = (
+        ("marketing", "Marketing"),
+        ("developer_relations", "Developer Relations"),
+        ("sales", "Sales"),
+        ("content_creator", "Content Creator"),
+    )
+
+    USAGE_REASON_CHOICES = (
+        ("creating_videos", "Creating new videos"),
+        ("editing_videos", "Editing videos"),
+        ("screen_capture", "Screen capture"),
+    )
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
+    name = models.CharField(max_length=100, blank=True)
+    profile_url = models.URLField(blank=True)
+    is_email_verified = models.BooleanField(default=False)
+    verification_sent_at = models.DateTimeField(null=True, blank=True)
+    verification_token = models.CharField(max_length=100, blank=True, null=True)
+    company_role = models.CharField(
+        max_length=50, choices=COMPANY_ROLE_CHOICES, blank=True, null=True
+    )
+    usage_reason = models.CharField(
+        max_length=50, choices=USAGE_REASON_CHOICES, blank=True, null=True
+    )
+    stripe_customer_id = models.CharField(max_length=100, blank=True, null=True)
+    stripe_price_id = models.CharField(max_length=100, blank=True, null=True)
+    has_subscription_access = models.BooleanField(default=False)
+    subscription_renewal_date = models.DateTimeField(null=True, blank=True)
+    active_org = models.ForeignKey(
+        "Organization", on_delete=models.CASCADE, null=True
+    )
+    auth_token = models.JSONField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.user.username
+
+
 class Organization(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
-    created_by = models.ForeignKey("releases.AppUser", on_delete=models.CASCADE)
+    created_by = models.ForeignKey(AppUser, on_delete=models.CASCADE)
     members = models.ManyToManyField(
-        "releases.AppUser", related_name="organizations", through="Membership"
+        AppUser, related_name="organizations", through="Membership"
     )
 
     def __str__(self):
@@ -22,7 +64,7 @@ class Organization(models.Model):
 
 
 class Membership(models.Model):
-    user = models.ForeignKey("releases.AppUser", on_delete=models.CASCADE)
+    user = models.ForeignKey(AppUser, on_delete=models.CASCADE)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     ROLE_CHOICES = [
         ("read_only", "Read Only"),
@@ -39,7 +81,7 @@ class Workspace(models.Model):
         Organization, on_delete=models.CASCADE, related_name="projects"
     )
     user = models.ForeignKey(
-        "releases.AppUser", on_delete=models.CASCADE, related_name="projects"
+        AppUser, on_delete=models.CASCADE, related_name="projects"
     )
     inputs = models.JSONField(null=True, blank=True)
 
@@ -99,7 +141,7 @@ def ensure_user_has_organization(user):
     return None
 
 
-@receiver(post_save, sender="releases.AppUser")
+@receiver(post_save, sender=AppUser)
 def create_default_organization(sender, instance, created, **kwargs):
     # ensure_user_has_organization(instance)
     pass
@@ -108,7 +150,6 @@ def create_default_organization(sender, instance, created, **kwargs):
 @receiver(user_logged_in)
 def handle_user_login(sender, request, user, **kwargs):
     print("handle_user_login", user)
-    from releases.models import AppUser
 
     try:
         u = AppUser.objects.get(user=user)

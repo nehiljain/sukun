@@ -384,7 +384,7 @@ class Room(models.Model):
     name = models.CharField(max_length=255)
     daily_room_name = models.CharField(max_length=255, unique=True)
     daily_room_url = models.URLField()
-    created_by = models.ForeignKey("releases.AppUser", on_delete=models.CASCADE)
+    created_by = models.ForeignKey("user_org.AppUser", on_delete=models.CASCADE)
     org = models.ForeignKey("user_org.Organization", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -414,7 +414,7 @@ class Recording(models.Model):
     daily_session_data = models.JSONField(null=True, blank=True)
     tracks_downloaded = models.BooleanField(default=False)
     created_by = models.ForeignKey(
-        "releases.AppUser", on_delete=models.CASCADE, related_name="recordings"
+        "user_org.AppUser", on_delete=models.CASCADE, related_name="recordings"
     )
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="recordings")
 

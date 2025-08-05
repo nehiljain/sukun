@@ -24,13 +24,11 @@ from drf_spectacular.views import (
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
-from releases.views_app import app_noauth_page
-from releases.views_auth import app_logout, auth, callback, google_auth, google_callback
+from user_org.views_app import app_noauth_page
+from user_org.views_auth import app_logout, google_auth, google_callback
 
 # Group related URLs
 auth_patterns = [
-    path("auth/github", auth, name="auth"),
-    path("auth/github/callback", callback, name="auth_callback"),
     path("logout", app_logout, name="app_logout"),
     path("auth/google", google_auth, name="auth"),
     path("auth/google/callback", google_callback, name="auth_callback"),
@@ -64,7 +62,7 @@ urlpatterns += [
     # Include grouped URL patterns
     path("", include(auth_patterns)),
     # Include app-specific URLs
-    path("", include("releases.urls")),
+    # path("", include("releases.urls")),
     path("", include("video_gen.urls")),
     # path("", include("sound_gen.urls")),
     path("", include("user_org.urls")),

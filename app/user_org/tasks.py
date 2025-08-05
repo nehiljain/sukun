@@ -9,15 +9,15 @@ from django.utils import timezone
 logger = logging.getLogger(__name__)
 
 
-@shared_task(bind=True, max_retries=3, name="releases.send_user_sign_up_email")
+@shared_task(bind=True, max_retries=3, name="user_org.send_user_sign_up_email")
 def send_user_sign_up_email(self, user_id, verification_url):
     try:
-        from releases.models import AppUser
+        from user_org.models import AppUser
 
         app_user = AppUser.objects.get(user__id=user_id)
         template_path = (
             Path(settings.BASE_DIR)
-            / "releases"
+            / "user_org"
             / "templates"
             / "email"
             / "verification_email.html"

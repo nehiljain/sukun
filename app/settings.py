@@ -60,7 +60,7 @@ INSTALLED_APPS = [
     "oauth2_provider",
     "user_org",
     "common",
-    "releases",
+    # "releases",
     "jsoneditor",
     "django_seed",
     "video_gen",

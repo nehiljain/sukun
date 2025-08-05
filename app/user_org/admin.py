@@ -1,9 +1,25 @@
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
+from django.db.models import JSONField
 from django.urls import reverse
 from django.utils.html import format_html
+from jsoneditor.forms import JSONEditor
 
-from .models import AnonymousSession, Membership, Organization, Workspace
+from .models import (
+    AnonymousSession,
+    AppUser,
+    Membership,
+    Organization,
+    Workspace,
+)
+
+
+@admin.register(AppUser)
+class AppUserAdmin(ModelAdmin):
+    list_display = ("user", "name", "is_email_verified", "created_at", "updated_at")
+    search_fields = ["user__username", "name", "user__email"]
+    list_filter = ("is_email_verified", "company_role", "usage_reason", "has_subscription_access")
+    raw_id_fields = ("user", "active_org")
 
 
 @admin.register(Organization)

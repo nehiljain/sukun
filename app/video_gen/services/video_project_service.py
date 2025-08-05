@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 from common.llm_utils import MODEL_4OMINI, call_openai_api_with_structure
 from django.db import models
 from pydantic import BaseModel
-from releases.models import AppUser
+from user_org.models import AppUser
 from user_org.models import Workspace
 from video_gen.models import Media, RenderVideo, VideoProject, VideoProjectMedia
 from video_gen.serializers import MediaSerializer

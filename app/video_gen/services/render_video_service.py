@@ -4,7 +4,7 @@ from typing import Dict, List, Optional
 
 from common.llm_utils import MODEL_4OMINI, call_openai_api_with_structure
 from pydantic import BaseModel
-from releases.models import AppUser
+from user_org.models import AppUser
 from video_gen.models import RenderVideo
 from video_gen.services.chat_service import ChatMessage, ChatService
 

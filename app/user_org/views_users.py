@@ -9,13 +9,13 @@ from django.contrib.auth.decorators import login_not_required, login_required
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from releases.models import AppUser
-from releases.permissions import IsAppUser
 from rest_framework import serializers, status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from user_org.models import AppUser
+from user_org.permissions import IsAppUser
 
 from .tasks import send_user_sign_up_email
 

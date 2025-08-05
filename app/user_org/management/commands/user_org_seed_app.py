@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
-from releases.models import AppUser
+from user_org.models import AppUser
 from user_org.models import Membership, Organization, Workspace
 
 

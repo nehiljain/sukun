@@ -8,14 +8,49 @@ from django.db import transaction
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
 from django.views.decorators.csrf import csrf_exempt
-from releases.models import AppUser
-from releases.views_auth import ensure_user_has_organization
+from user_org.models import AppUser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from user_org.models import Membership, Organization, Workspace
+
 logger = logging.getLogger(__name__)
 
+def ensure_user_has_organization(app_user):
+    # First check if the user is an AppUser
+
+    # if not hasattr(user, 'appuser'):
+    #     print("returning None")
+    #     return None
+
+    # Check if user has any organization where they are an owner
+    has_org = Membership.objects.filter(user=app_user, role="owner").exists()
+
+    if not has_org:
+        # Create new organization for user
+        org = Organization.objects.create(
+            name=f"{app_user.name}'s Org", created_by=app_user
+        )
+        app_user.active_org = org
+        app_user.save()
+        # Add the user as an owner
+        Membership.objects.create(user=app_user, organization=org, role="owner")
+        # Create default project
+        Workspace.objects.create(
+            name="Default Project", organization=org, user=app_user
+        )
+        return org
+    return None
+
+def ensure_user_is_stripe_customer(app_user):
+    if not app_user.stripe_customer_id:
+        # Create a new Stripe customer
+        stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
+        customer = stripe.Customer.create(email=app_user.user.email)
+        app_user.stripe_customer_id = customer.id
+        app_user.save()
+    return app_user.stripe_customer_id
 
 @csrf_exempt
 def stripe_webhook_handler(request):

@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
-from releases.models import AppUser
+from user_org.models import AppUser
 from rest_framework import status
 from rest_framework.test import APIClient
 from user_org.models import Organization

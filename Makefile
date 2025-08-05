@@ -10,6 +10,8 @@ help:
 	@echo "  dev/down          - Stop development environment"
 	@echo "  dev/build         - Build development Docker image"
 	@echo "  dev/rebuild       - Rebuild development image (no cache)"
+	@echo "  dev/debug         - Start development with debugging enabled"
+	@echo "  dev/reset         - Reset development environment (WARNING: destroys data)"
 	@echo "  dev/logs          - View development logs"
 	@echo "  dev/shell         - Access development container shell"
 	@echo ""
@@ -17,15 +19,9 @@ help:
 	@echo "  db/up             - Start database only"
 	@echo "  db/down           - Stop database"
 	@echo "  db/reset          - Reset database (WARNING: destroys data)"
-	@echo "  db/backup         - Backup database"
-	@echo "  db/restore        - Restore database from backup"
 	@echo ""
 	@echo "=== Django Management ==="
 	@echo "  manage            - Run Django management commands (COMMAND=<cmd>)"
-	@echo "  migrate           - Run database migrations"
-	@echo "  makemigrations    - Create new migrations"
-	@echo "  shell             - Start Django shell"
-	@echo "  collectstatic     - Collect static files"
 	@echo ""
 	@echo "=== Testing ==="
 	@echo "  test              - Run all tests"
@@ -66,7 +62,7 @@ dev/up:
 	@echo "🚀 Starting development environment..."
 	@docker compose --profile dev up -d
 	@echo "✅ Development environment started!"
-	@echo "   - Web: http://localhost:8001"
+	@echo "   - Web: http://localhost:8000"
 	@echo "   - DB Admin: http://localhost:8889 (admin/admin)"
 	@echo "   - Database: localhost:5433"
 
@@ -90,6 +86,18 @@ dev/logs:
 
 dev/shell:
 	@docker compose exec web bash
+
+dev/reset:
+	@echo "🔄 Resetting development environment..."
+	@echo "⚠️  WARNING: This will destroy all database data!"
+	@read -p "Are you sure? (y/N): " confirm; \
+	if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
+		docker compose --profile dev --profile debug down -v --remove-orphans; \
+		docker volume rm $(PROJECT_NAME)_pgdata 2>/dev/null || true; \
+		echo "✅ Development environment reset complete!"; \
+	else \
+		echo "❌ Development environment reset cancelled."; \
+	fi
 
 # =============================================================================
 # Database Management
@@ -115,20 +123,6 @@ db/reset:
 		echo "❌ Database reset cancelled."; \
 	fi
 
-db/backup:
-	@echo "💾 Creating database backup..."
-	@mkdir -p backups
-	@docker compose exec db pg_dump -U postgres -d $(PROJECT_NAME) > backups/backup_$(shell date +%Y%m%d_%H%M%S).sql
-	@echo "✅ Database backup created in backups/"
-
-db/restore:
-	@echo "📥 Restoring database from backup..."
-	@if [ -z "$(BACKUP_FILE)" ]; then \
-		echo "❌ Please specify BACKUP_FILE=path/to/backup.sql"; \
-		exit 1; \
-	fi
-	@docker compose exec -T db psql -U postgres -d $(PROJECT_NAME) < $(BACKUP_FILE)
-	@echo "✅ Database restored!"
 
 # =============================================================================
 # Django Management
@@ -144,24 +138,6 @@ manage:
 	else \
 		uv run python manage.py $(COMMAND); \
 	fi
-
-migrate:
-	@echo "🔄 Running database migrations..."
-	@$(MAKE) manage COMMAND=migrate
-	@echo "✅ Migrations complete!"
-
-makemigrations:
-	@echo "📝 Creating new migrations..."
-	@$(MAKE) manage COMMAND=makemigrations
-	@echo "✅ Migrations created!"
-
-shell:
-	@$(MAKE) manage COMMAND=shell
-
-collectstatic:
-	@echo "📦 Collecting static files..."
-	@$(MAKE) manage COMMAND="collectstatic --noinput"
-	@echo "✅ Static files collected!"
 
 # =============================================================================
 # Testing

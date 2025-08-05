@@ -16,7 +16,10 @@
       "Bash(make:*)",
       "Bash(docker compose exec:*)",
       "Bash(docker compose logs:*)",
-      "Bash(uv lock:*)"
+      "Bash(uv lock:*)",
+      "Bash(cp:*)",
+      "Bash(find:*)",
+      "Bash(sed:*)"
     ],
     "deny": []
   }

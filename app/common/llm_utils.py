@@ -12,9 +12,6 @@ from langchain_openai import ChatOpenAI
 
 set_llm_cache(SQLiteCache(database_path=".langchain.db"))
 
-LLM_LLAMA_31_70B_MODEL = ChatLiteLLM(
-    model="fireworks_ai/accounts/fireworks/models/llama-v3p1-70b-instruct"
-)
 
 FIREFUNC_MODEL: str = "accounts/fireworks/models/firefunction-v2"
 LLAMA_70B_MODEL: str = "accounts/fireworks/models/llama-v3p1-70b-instruct"

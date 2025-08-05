@@ -44,17 +44,6 @@ export function getMenuList(pathname: string): Group[] {
       ],
     },
     {
-      groupLabel: "Mini Apps",
-      menus: [
-        {
-          href: "/listing-shorts",
-          label: "Listing Shorts",
-          active: pathname.includes("/listing-shorts"),
-          icon: Video,
-        },
-      ],
-    },
-    {
       groupLabel: "Video Generation",
       menus: [
         // {

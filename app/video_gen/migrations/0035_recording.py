@@ -7,7 +7,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("releases", "0018_appuser_has_subscription_access_and_more"),
         ("user_org", "0009_anonymoussession_email"),
         ("video_gen", "0034_alter_rendervideo_status_alter_videoproject_status"),
     ]
@@ -62,7 +61,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="recordings",
-                        to="releases.appuser",
+                        to="user_org.appuser",
                     ),
                 ),
                 (
