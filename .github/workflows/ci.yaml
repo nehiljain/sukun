@@ -32,6 +32,9 @@ concurrency:
 jobs:
   # Quick lint check that fails fast
   lint:
+    permissions:
+      pull-requests: write
+      contents: read
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -266,7 +269,7 @@ jobs:
             IdentityFile ~/.ssh/staging.key
             StrictHostKeyChecking no
           END
-          
+
           # Copy deployment files to server
           scp docker-compose.prod.yaml staging:${{ env.PROJECT_NAME }}_${{ env.ENVIRONMENT }}/
           scp Makefile staging:${{ env.PROJECT_NAME }}_${{ env.ENVIRONMENT }}/

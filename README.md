@@ -24,14 +24,25 @@ App Features:
 - [x] Authentication (Google)
 - [x] Stripe Integration for Subscriptions
 - [x] Async Job Queues with Celery
+- [ ] Simple Product Blog with CMS
+- [ ] Celery Hook with N8N for workflow automation
 
-Ops and Infra Features:
+DX Features:
 - [x] Continuous deployment (Github)
-- [x] PostHog Analytics
 - [x] Notion <> DB Integration
 - [x] Frontend Hot Reloading
+
+Deployment and Infra Features:
+- [ ] Public S3 bucket + CDN for storing assets
 - [ ] Deployment to Fly.io
 - [ ] Deployment to AWS Fargate
+
+Monitoring and Observability:
+- [x] PostHog Analytics
+- [ ] LLM Tracing with LangSmith?
+- [ ] Log forwarding to NewRelic
+- [ ] Service Uptime Monitoring with NewRelic
+
 
 ## Prerequisites
 
@@ -56,6 +67,7 @@ Following SaaS services are needed to operate this:
 
    ```sh
    make dev/up
+   make manage COMMAND=migrate
    ```
 4. (Optional) Start the frontend development server with hot reloading:
    ```sh
