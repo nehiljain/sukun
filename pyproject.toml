@@ -1,0 +1,139 @@
+# Since this is an application, we can omit the build-system section
+# or keep it minimal if you want tooling compatibility
+
+[project]
+name = "gestral"
+version = "0.1.0"
+description = ""
+readme = "README.md"
+requires-python = ">=3.10, <3.13"
+authors = [
+    {name = "Selvam Palanimalai"},
+]
+
+# Dependencies listed for documentation purposes
+# UV will read these
+dependencies = [
+    "fastapi>=0.111.0",
+    "sqlalchemy>=2.0.34",
+    "psycopg2-binary>=2.9.9",
+    "prefect>=3.0.2",
+    "pygithub>=2.4.0",
+    "requests>=2.32.3",
+    "slack-sdk>=3.32.0",
+    "python-dotenv>=1.0.1",
+    "pinecone-client>=5.0.1",
+    "typer>=0.12.0",
+    "requests-cache>=1.2.1",
+    "semchunk>=2.2.0",
+    "tree-sitter>=0.23.0",
+    "GitPython>=3.1.30",
+    "networkx>=3.0",
+    "diskcache>=5.6.3",
+    "tiktoken>=0.7.0",
+    "scipy>=1.14.1",
+    "langchain-fireworks>=0.1.0",
+    "jupyterlab>=4.2.5",
+    "langchain-core>=0.2.38",
+    "langchain-community>=0.2.0",
+    "langchain-openai>=0.3.0",
+    "pymongo>=4.8.0",
+    "langsmith>=0.1.121",
+    "thefuzz>=0.22.1",
+    "motor>=3.6.0",
+    "pydantic>=2.9.2",
+    "django>=5.1.1",
+    "djangorestframework>=3.15.2",
+    "django-filter>=24.3",
+    "django-cors-headers>=4.4.0",
+    "supabase>=2.7.4",
+    "dj-rest-auth>=6.0.0",
+    "django-allauth>=65.0.1",
+    "django-oauth-toolkit>=3.0.1",
+    "django-environ>=0.11.2",
+    "django-jsoneditor>=0.2.4",
+    "django-tinymce>=4.1.0",
+    "e2b>=1.0.0",
+    "e2b-code-interpreter>=1.0.0",
+    "firecrawl-py>=1.2.4",
+    "django-seed>=0.3.1",
+    "langchain-postgres>=0.0.12",
+    "langgraph>=0.2.39",
+    "litellm>=1.51.0",
+    "Pygments>=2.18.0",
+    "configargparse",
+    "python-Levenshtein>=0.26.0",
+    "playwright>=1.48.0",
+    "whitenoise>=6.8.2",
+    "gunicorn>=23.0.0",
+    "resend>=2.4.0",
+    "docutils>=0.21.2",
+    "google-auth>=2.38.0",
+    "google-cloud-storage>=3.1.0",
+    "opencv-python>=4.11.0.86",
+    "drf-spectacular>=0.28.0",
+    "lumaai>=1.12.0",
+    "boto3>=1.37.25",
+    "celery[sqlalchemy,sqs,redis]>=5.5.0",
+    "stripe>=11.6.0",
+    "pillow-heif>=0.22.0",
+    "beautifulsoup4>=4.13.3",
+    "trafilatura>=2.0.0",
+    "fake-useragent>=2.1.0",
+    "django-celery-results>=2.6.0",
+    "pillow-avif-plugin>=1.5.2",
+    "assemblyai>=0.40.2",
+    "pinecone>=7.3.0",
+    "redis>=5.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.6.5",
+    "pre-commit>=3.8.0",
+    "pytest>=8.3.3",
+    "pytest-anyio>=0.0.0",
+]
+
+# UV specific configuration
+[tool.uv]
+# UV doesn't currently need specific configuration in pyproject.toml
+# It will use the dependencies and optional-dependencies automatically
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+]
+ignore = [
+    "E501",  # line too long, handled by formatter
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.lint.isort]
+known-third-party = ["fastapi", "pydantic", "starlette"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[dependency-groups]
+dev = [
+    "coverage>=7.8.0",
+    "freezegun>=1.5.1",
+    "pre-commit>=4.1.0",
+]

@@ -18,17 +18,31 @@ This is an opnionated version of [Shipfast](https://shipfa.st/). More details ab
 ## Features
 
 App Features:
-- RESTFul API backend
-- Simple Frontend Stack - Vite.js, React.
-- Email Flows
-- Authentication (Google)
-- Stripe Integration for Subscriptions
-- Async Job Queues
+- [x] RESTFul API backend with Swagger docs.
+- [x] Simple Frontend Stack - Vite.js, React.
+- [x] Email Flows
+- [x] Authentication (Google)
+- [x] Stripe Integration for Subscriptions
+- [x] Async Job Queues with Celery
+- [ ] Simple Product Blog with CMS
+- [ ] Celery Hook with N8N for workflow automation
 
-Ops and Infra Features:
-- Continuous deployment (Github)
-- Notebook <> DB Integration
-- TBD
+DX Features:
+- [x] Continuous deployment (Github)
+- [x] Notion <> DB Integration
+- [x] Frontend Hot Reloading
+
+Deployment and Infra Features:
+- [ ] Public S3 bucket + CDN for storing assets
+- [ ] Deployment to Fly.io
+- [ ] Deployment to AWS Fargate
+
+Monitoring and Observability:
+- [x] PostHog Analytics
+- [ ] LLM Tracing with LangSmith?
+- [ ] Log forwarding to NewRelic
+- [ ] Service Uptime Monitoring with NewRelic
+
 
 ## Prerequisites
 
@@ -52,12 +66,16 @@ Following SaaS services are needed to operate this:
 3. Build and Deploy app.
 
    ```sh
-   make setup
-   make dev
+   make dev/up
+   make manage COMMAND=migrate
    ```
-4. App is running at http://localhost:8000/
+4. (Optional) Start the frontend development server with hot reloading:
+   ```sh
+   make fe/dev
+   ```
+5. App is running at http://localhost:8000/
 
-## Deployment
+## Deployment (WIP)
 
 This application can be deployed in 3 ways:
 1. Self Managed VM (AWS, GCP, OVHCloud )

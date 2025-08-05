@@ -1,0 +1,58 @@
+{# This is base.html #}
+<html class="dark">
+  <head>
+    {% load static %}
+    <link rel="icon" type="image/svg+xml" href="{% static 'logo.svg' %}" />
+    <meta
+      name="viewport"
+      content="minimum-scale=1, initial-scale=1, width=device-width"
+    />
+    <meta http-equiv="content-language" content="en-US" />
+    <meta http-equiv="Content-Security-Policy" content="{% if debug %}default-src 'self' ws://localhost:5173/ http://localhost:5173 http://localhost:5174 https://app.demodrive.tech blob: 'https://demodriveai.daily.co/';
+                                frame-src 'self' https://demodriveai.daily.co/;
+                                script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:5173 http://localhost:5174 https://cdn.tailwindcss.com https://us-assets.i.posthog.com https://storage.googleapis.com https://dev-assets.demodrive.tech https://stage-assets.demodrive.tech https://prod-assets.demodrive.tech;
+                                style-src 'self' 'unsafe-inline' http://localhost:5173 http://localhost:5174 https://cdn.tailwindcss.com;
+                                connect-src 'self' ws://localhost:5173/ http://localhost:5173 http://localhost:5174 https://api.pexels.com/ https://us.i.posthog.com https://storage.googleapis.com https://dev-assets.demodrive.tech https://stage-assets.demodrive.tech https://prod-assets.demodrive.tech;
+                                img-src 'self' data: https: blob:;
+                                font-src 'self' data: https:;
+                                media-src 'self' data: blob: https://videos.pexels.com/ https://rwxrdxvxndclnqvznxfj.supabase.co/ blob:https://app.demodrive.tech/ https://app.demodrive.tech https://commondatastorage.googleapis.com https://storage.googleapis.com https://dev-assets.demodrive.tech https://stage-assets.demodrive.tech https://prod-assets.demodrive.tech;{% else %}default-src 'self' https://app.demodrive.tech blob: 'https://demodriveai.daily.co/';
+                                frame-src 'self' https://demodriveai.daily.co/;
+                                script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://us-assets.i.posthog.com https://storage.googleapis.com https://dev-assets.demodrive.tech https://stage-assets.demodrive.tech https://prod-assets.demodrive.tech;
+                                style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com;
+                                connect-src 'self' https://api.pexels.com/ https://us.i.posthog.com https://storage.googleapis.com https://dev-assets.demodrive.tech https://stage-assets.demodrive.tech https://prod-assets.demodrive.tech;
+                                img-src 'self' data: https: blob:;
+                                font-src 'self' data: https:;
+                                media-src 'self' data: blob: https://videos.pexels.com/ https://rwxrdxvxndclnqvznxfj.supabase.co/ blob:https://app.demodrive.tech/ https://app.demodrive.tech https://commondatastorage.googleapis.com https://storage.googleapis.com https://dev-assets.demodrive.tech https://stage-assets.demodrive.tech https://prod-assets.demodrive.tech;{% endif %}">
+
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <title>DemoDrive AI - AI copilot for technical GTM workflows</title>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    {% if debug %}
+      <!-- Vite dev server assets -->
+      <script type="module">
+        import RefreshRuntime from "http://localhost:5173/@react-refresh"
+        RefreshRuntime.injectIntoGlobalHook(window)
+        window.$RefreshReg$ = () => {}
+        window.$RefreshSig$ = () => (type) => type
+        window.__vite_plugin_react_preamble_installed__ = true
+      </script>
+      <script type="module" src="http://localhost:5173/@vite/client"></script>
+      <script type="module" src="http://localhost:5173/src/main.tsx"></script>
+    {% else %}
+      <!-- Production assets -->
+      <link rel="stylesheet" href="{% static 'main.css' %}" />
+    {% endif %}
+    {% block meta %} {%endblock %}
+  </head>
+
+  <body>
+    {% block header %} {% endblock %}
+    <div class="flex flex-col justify-center text-black">
+      {% block content %} {% endblock %}
+    </div>
+  </body>
+</html>

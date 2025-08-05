@@ -1,0 +1,107 @@
+__pycache__/
+node_modules/
+.venv/
+.ruff_cache/
+.aider*
+# Prefect
+.prefect/
+# FastAPI
+instance/
+*.db
+*.sqlite3
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+# Thumbnails
+._*
+# Icon must end with two \r
+Icon
+# Python
+*.pyc
+*.pyo
+*.pyd
+
+# VS Code
+.vscode/
+
+# data
+data/
+*.csv
+*.parquet
+
+*.sqlite
+*.db
+*.pkl
+*.pickle
+*.mp4
+
+# logs
+logs/
+
+# .env
+.env
+.env_lg
+.env_staging
+.env_prod
+app/client/.env
+
+# media files
+*.cast
+*.mp4
+
+public/
+static/
+
+github_ssh_key*
+
+vale-configs/repo/
+.langgraph_api/
+
+# Video processing
+output/
+out/
+
+.cursorrules
+.cursor/
+
+# temporary files
+video-processing/revideo-template/dist/
+video-processing/revideo-template/output/
+video-processing/public/
+video-processing/voiceovers/output/
+video-processing/out/
+
+
+.ipynb_checkpoints/
+video-processing/voiceovers/new_podcast.wav
+video-processing/voiceovers/voices.bin
+video-processing/voiceovers/kokoro-v0_19.onnx
+
+
+app/.remotion/
+gcs-credentials.json
+
+
+# images and videos and medis
+**/**/*.webm
+**/**/*.mp4
+**/**/*.mp3
+**/**/*.jpg
+**/**/*.png
+**/**/*.gif
+**/**/*.jpeg
+**/**/*.webp
+
+video-processing/music-marker-experiment/zillow_page_source_*
+video-processing/music-marker-experiment/zillow_images/*
+generated_videos/
+
+
+# /infra
+infra/**/.terraform/
+infra/**/.terraform.lock.hcl
+infra/ami-builder/output/
+
+failed_uploads/
+infra/

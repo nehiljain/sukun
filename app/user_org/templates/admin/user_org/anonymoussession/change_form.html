@@ -1,0 +1,38 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{% block content %}
+{{ block.super }}
+
+{% if video_projects %}
+<div class="module">
+    <h2>Associated Video Projects</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in video_projects %}
+            <tr>
+                <td>{{ project.name }}</td>
+                <td>{{ project.get_status_display }}</td>
+                <td>{{ project.created_at }}</td>
+                <td>{{ project.updated_at }}</td>
+                <td>
+                    <a href="{% url 'admin:video_gen_videoproject_change' project.id %}">
+                        View Details
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

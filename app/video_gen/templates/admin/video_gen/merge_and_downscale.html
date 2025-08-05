@@ -1,0 +1,58 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<!-- <style>
+    .merge-downscale-form {
+        margin: 40px auto;
+        max-width: 500px;
+        padding: 30px;
+        background: #fff;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .merge-downscale-form h1 {
+        margin-bottom: 25px;
+        font-size: 1.6em;
+    }
+    .merge-downscale-form label {
+        font-weight: bold;
+        margin-top: 15px;
+        display: block;
+    }
+    .merge-downscale-form input, .merge-downscale-form select {
+        width: 100%;
+        padding: 8px 10px;
+        margin-top: 5px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1em;
+    }
+    .merge-downscale-form button {
+        background: #417690;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        font-size: 1em;
+        cursor: pointer;
+    }
+    .merge-downscale-form button:hover {
+        background: #295570;
+    }
+</style> -->
+{% endblock %}
+
+{% block content %}
+<div class="merge-downscale-form">
+    <h1>Upload, Merge & Downscale S3 Videos</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Start Task</button>
+    </form>
+    <a href="{% url 'admin:video_gen_videoproject_changelist' %}" class="button" style="margin-top: 20px; display: inline-block;">← Back to Projects</a>
+</div>
+{% endblock %}

@@ -1,0 +1,287 @@
+name: CI
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/ci.yaml'
+      - 'app/**'
+      - 'Dockerfile'
+      - 'docker-*.yaml'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - 'Makefile'
+      - 'infra/**'
+      - 'web/**'
+  push:
+    branches: [main, sp/ci]
+    paths:
+      - '.github/workflows/ci.yaml'
+      - 'app/**'
+      - 'Dockerfile'
+      - 'docker-*.yaml'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - 'Makefile'
+      - 'infra/**'
+      - 'web/**'
+
+# Cancel previous runs if a new one is triggered
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Quick lint check that fails fast
+  lint:
+    permissions:
+      pull-requests: write
+      contents: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build lint image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          target: development
+          load: true
+          tags: gestral:lint
+          cache-from: type=gha
+          cache-to: type=gha,mode=min
+
+      - name: Run linting
+        run: |
+          docker run --rm gestral:lint bash -c "
+            python -m flake8 app/ --count --statistics || exit 1
+            python -m black --check app/ || exit 1
+            python -m isort --check-only app/ || exit 1
+          "
+
+  # Check for changes to determine what to test
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.changes.outputs.backend }}
+      frontend: ${{ steps.changes.outputs.frontend }}
+      docker: ${{ steps.changes.outputs.docker }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            backend:
+              - 'app/**'
+              - 'pyproject.toml'
+              - 'uv.lock'
+              - '.github/workflows/ci.yaml'
+            frontend:
+              - 'web/**'
+            docker:
+              - 'Dockerfile'
+              - 'docker-*.yaml'
+
+  # Backend tests (only run if backend code changed)
+  backend-test:
+    runs-on: ubuntu-latest
+    needs: [lint, changes]
+    if: needs.changes.outputs.backend == 'true'
+    timeout-minutes: 15
+    env:
+      PYTHONUNBUFFERED: 1
+      POSTGRES_PASSWORD: very-complex-passwOrd
+      APP_DATABASE_URL: postgresql://postgres:very-complex-passwOrd@127.0.0.1:5432/postgres
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      VITE_REACT_APP_PUBLIC_POSTHOG_KEY: ${{ secrets.VITE_REACT_APP_PUBLIC_POSTHOG_KEY }}
+      VITE_NEXT_PUBLIC_PEXELS_API_KEY: ${{ secrets.VITE_NEXT_PUBLIC_PEXELS_API_KEY }}
+      VITE_REACT_APP_PUBLIC_POSTHOG_HOST: ${{ vars.VITE_REACT_APP_PUBLIC_POSTHOG_HOST }}
+      ENVIRONMENT: staging
+      PROJECT_NAME: gestral
+      DOCKER_BUILDKIT: 1
+      ENABLE_SIGNALING: false
+      LOCAL_PROCESSING: true
+      AWS_STORAGE_BUCKET_NAME: demodrive-ci
+      AWS_REGION: us-west-1
+      SITE_URL: http://ci.demodrive.tech
+      ADMIN_EMAILS: selvam@demodrive.tech
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create .env file
+        run: printenv > .env
+
+      - name: Start database for testing
+        run: make db/up
+
+      - name: Build test image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          target: development
+          load: true
+          tags: gestral:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Wait for database to be ready
+        run: |
+          timeout 60 bash -c 'until docker compose exec db pg_isready -d $PROJECT_NAME -U postgres; do sleep 1; done'
+
+      - name: Run migrations
+        run: |
+          docker run --rm --network container:$(docker compose ps -q db) \
+            -e DATABASE_URL=postgresql://postgres:very-complex-passwOrd@127.0.0.1:5432/gestral \
+            gestral:test python app/manage.py migrate
+
+      - name: Run tests with coverage
+        run: |
+          docker run --rm --network container:$(docker compose ps -q db) \
+            -e DATABASE_URL=postgresql://postgres:very-complex-passwOrd@127.0.0.1:5432/gestral \
+            -v $PWD:/workspace \
+            gestral:test bash -c "
+              python -m coverage run --source=app -m pytest app/ -v --tb=short &&
+              python -m coverage report -m &&
+              python -m coverage xml -o /workspace/coverage.cobertura.xml
+            "
+
+      - name: Code Coverage Summary Report
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: coverage.cobertura.xml
+          badge: true
+          fail_below_min: true
+          format: markdown
+          hide_branch_rate: false
+          hide_complexity: true
+          indicators: true
+          output: both
+          thresholds: '30 50'
+
+      - name: Cleanup database
+        if: always()
+        run: make db/down
+
+  # Frontend tests (only run if frontend code changed)
+  frontend-test:
+    runs-on: ubuntu-latest
+    needs: [changes]
+    if: needs.changes.outputs.frontend == 'true'
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+          cache-dependency-path: 'web/yarn.lock'
+
+      - name: Install dependencies
+        run: cd web && yarn install --frozen-lockfile
+
+      - name: Run frontend linting
+        run: cd web && yarn lint
+
+      - name: Run frontend tests
+        run: cd web && yarn test --passWithNoTests
+
+      - name: Build frontend
+        run: cd web && yarn build
+
+  # Docker build (only on main branch or when Docker files change)
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: [lint, changes, backend-test, frontend-test]
+    if: |
+      always() &&
+      (needs.lint.result == 'success') &&
+      (needs.backend-test.result == 'success' || needs.backend-test.result == 'skipped') &&
+      (needs.frontend-test.result == 'success' || needs.frontend-test.result == 'skipped') &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/sp/ci' || needs.changes.outputs.docker == 'true')
+    timeout-minutes: 20
+    env:
+      PROJECT_NAME: gestral
+      ENVIRONMENT: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Configure AWS credentials
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/sp/ci'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_ECR_REGION }}
+
+      - name: Login to Amazon ECR
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/sp/ci'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build production image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          target: production
+          push: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/sp/ci' }}
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ vars.AWS_ECR_REPOSITORY }}:${{ env.ENVIRONMENT }}-latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ vars.AWS_ECR_REPOSITORY }}:${{ env.ENVIRONMENT }}-${{ github.sha }}
+          cache-from: |
+            type=gha
+            type=registry,ref=${{ steps.login-ecr.outputs.registry }}/${{ vars.AWS_ECR_REPOSITORY }}:${{ env.ENVIRONMENT }}-buildcache
+          cache-to: |
+            type=gha,mode=max
+            type=registry,ref=${{ steps.login-ecr.outputs.registry }}/${{ vars.AWS_ECR_REPOSITORY }}:${{ env.ENVIRONMENT }}-buildcache,mode=max
+          platforms: linux/amd64
+
+  # Deploy (only on main branch)
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [docker-build]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/sp/ci'
+    timeout-minutes: 10
+    env:
+      PROJECT_NAME: gestral
+      ENVIRONMENT: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to staging server
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/staging.key
+          chmod 600 ~/.ssh/staging.key
+          cat >>~/.ssh/config <<END
+          Host staging
+            HostName $SSH_DEPLOYMENT_HOST
+            User $SSH_DEPLOYMENT_USERNAME
+            IdentityFile ~/.ssh/staging.key
+            StrictHostKeyChecking no
+          END
+
+          # Copy deployment files to server
+          scp docker-compose.prod.yaml staging:${{ env.PROJECT_NAME }}_${{ env.ENVIRONMENT }}/
+          scp Makefile staging:${{ env.PROJECT_NAME }}_${{ env.ENVIRONMENT }}/
+
+          # Deploy on server
+          ssh staging 'cd ${{ env.PROJECT_NAME }}_${{ env.ENVIRONMENT }} && \
+            aws ecr get-login-password --region ${{ vars.AWS_ECR_REGION }} | docker login --username AWS --password-stdin ${{ needs.docker-build.outputs.registry }} && \
+            docker pull ${{ needs.docker-build.outputs.registry }}/${{ vars.AWS_ECR_REPOSITORY }}:${{ env.ENVIRONMENT }}-${{ github.sha }} && \
+            docker tag ${{ needs.docker-build.outputs.registry }}/${{ vars.AWS_ECR_REPOSITORY }}:${{ env.ENVIRONMENT }}-${{ github.sha }} ${{ env.PROJECT_NAME }}:latest && \
+            PROJECT_NAME=${{ env.PROJECT_NAME }} docker compose -f docker-compose.prod.yaml up -d --remove-orphans && \
+            docker compose -f docker-compose.prod.yaml exec -T web python app/manage.py migrate'
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_DEPLOYMENT_HOST: ${{ vars.SSH_DEPLOYMENT_HOST }}
+          SSH_DEPLOYMENT_USERNAME: ${{ vars.SSH_DEPLOYMENT_USERNAME }}

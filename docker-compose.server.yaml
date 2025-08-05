@@ -1,0 +1,139 @@
+services:
+  web:
+    image: ${PROJECT_NAME}:latest
+    #command: ["/bin/sh","-c","python app/manage.py collectstatic --noinput && python app/manage.py runserver"]
+    environment:
+      - PREFECT_API_URL=http://prefect-server:4200/api
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 5G
+        reservations:
+          cpus: "1"
+          memory: 2G
+    volumes:
+      - ./.env:/opt/django/.env
+      - ./gcp-credentials.json:/opt/django/gcp-credentials.json
+    networks:
+      - single-box-app_default
+    profiles: ["web"]
+
+  aggregator:
+    image: ${PROJECT_NAME}:latest
+    command: ["python", "aggregator/prefect_flow.py"]
+    deploy:
+      resources:
+        limits:
+          cpus: "3"
+          memory: 4G
+        reservations:
+          cpus: "2"
+          memory: 2G
+    volumes:
+      - ./.env:/opt/app/.env
+    networks:
+      - single-box-app_default
+    profiles: ["flows"]
+
+  crunchd-generator:
+    image: ${PROJECT_NAME}:latest
+    command: ["python", "generator/prefect_flow.py", "-u", "all"]
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 512M
+    volumes:
+      - ./.env:/opt/app/.env
+    networks:
+      - single-box-app_default
+    profiles: ["flows"]
+
+  prefect-server:
+    image: prefecthq/prefect:2-python3.12
+    restart: always
+    volumes:
+      - prefect:/root/.prefect
+    entrypoint: ["prefect", "server", "start"]
+    environment:
+      - PREFECT_SERVER_API_HOST=0.0.0.0
+      - PREFECT_UI_URL=http://host:4200/api
+      - PREFECT_LOGGING_LEVEL=DEBUG
+      - PREFECT_API_REQUEST_LOGGING=1
+      - PREFECT_API_URL=http://host:4200/api
+      - PREFECT_API_DATABASE_CONNECTION_URL=${PREFECT_DATABASE_URL}
+      - PREFECT_API_DATABASE_ECHO=False
+      - PREFECT_API_DATABASE_MIGRATE_ON_START=True
+    ports:
+      - 4200:4200
+    networks:
+      - single-box-app_default
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 2G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+    profiles: ["p-server"]
+
+  ## Prefect Agent
+  prefect-agent:
+    image: prefecthq/prefect:2-python3.12
+    restart: always
+    entrypoint:
+      [
+        "/opt/prefect/entrypoint.sh",
+        "prefect",
+        "agent",
+        "start",
+        "-q",
+        "local-pool",
+      ]
+    environment:
+      - PREFECT_API_URL=http://prefect-server:4200/api
+    #       Use PREFECT_API_KEY if connecting the agent to Prefect Cloud
+    #     - PREFECT_API_KEY=YOUR_API_KEY
+    profiles: ["p-agent"]
+    networks:
+      - single-box-app_default
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    depends_on:
+      - prefect-server
+
+  ### Prefect CLI
+  prefect-cli:
+    image: prefecthq/prefect:2-python3.12
+    entrypoint: "bash"
+    working_dir: "/root/flows"
+    volumes:
+      - "./flows:/root/flows"
+    networks:
+      - single-box-app_default
+    environment:
+      - PREFECT_API_URL=http://prefect-server:4200/api
+    #       Use PREFECT_API_KEY to use the CLI to interact with Prefect Cloud
+    #     - PREFECT_API_KEY=YOUR_API_KEY
+    profiles: ["p-cli"]
+
+volumes:
+  pgdata:
+  pgadmin-data:
+  prefect:
+networks:
+  backend:
+    driver: bridge
+  single-box-app_default:
+    external: true
