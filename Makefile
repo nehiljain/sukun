@@ -44,6 +44,8 @@ help:
 	@echo "  ci/build          - Fast CI build (with caching)"
 	@echo "  ci/test           - Fast CI test suite"
 	@echo "  ci/lint           - Run linting and code checks"
+	@echo "  ci/migrate        - Run CI migrations (uses pre-built test image)"
+	@echo "  ci/test/coverage  - Run CI tests with coverage (uses pre-built test image)"
 	@echo ""
 	@echo "=== Utility ==="
 	@echo "  clean             - Clean up Docker resources"
@@ -146,35 +148,36 @@ manage:
 test:
 	@echo "🧪 Running tests..."
 	@if [ "$(RUNTIME)" = "docker" ]; then \
-		docker compose run --rm -e DJANGO_SETTINGS_MODULE=settings web python -m pytest app/ -v; \
+		echo "Using Docker runtime for tests..."; \
+		docker compose run --rm -e DJANGO_SETTINGS_MODULE=settings web python -m pytest . -v; \
 	else \
-		uv run python -m pytest app/ -v; \
+		cd app && PYTHONPATH=$(pwd) uv run python -m pytest . -v; \
 	fi
 
 test/unit:
 	@echo "🧪 Running unit tests..."
 	@if [ "$(RUNTIME)" = "docker" ]; then \
-		docker compose run --rm web python -m pytest app/ -v -m "not integration"; \
+		docker compose run --rm web python -m pytest . -v -m "not integration"; \
 	else \
-		uv run python -m pytest app/ -v -m "not integration"; \
+		uv run python -m pytest . -v -m "not integration"; \
 	fi
 
 test/integration:
 	@echo "🧪 Running integration tests..."
 	@if [ "$(RUNTIME)" = "docker" ]; then \
-		docker compose run --rm web python -m pytest app/ -v -m integration; \
+		docker compose run --rm web python -m pytest . -v -m integration; \
 	else \
-		uv run python -m pytest app/ -v -m integration; \
+		uv run python -m pytest . -v -m integration; \
 	fi
 
 test/coverage:
 	@echo "🧪 Running tests with coverage..."
 	@if [ "$(RUNTIME)" = "docker" ]; then \
-		docker compose run --rm web bash -c "python -m coverage run --source=app -m pytest app/ && python -m coverage report -m && python -m coverage xml -o coverage.cobertura.xml"; \
+		docker compose run --rm web bash -c "python -m coverage run --source=app -m pytest . && python -m coverage report -m && python -m coverage xml -o coverage.cobertura.xml"; \
 	else \
-		uv run python -m coverage run --source=app -m pytest app/; \
-		uv run python -m coverage report -m; \
-		uv run python -m coverage xml -o coverage.cobertura.xml; \
+		cd app && PYTHONPATH=$(pwd) uv run python -m coverage run --source=app -m pytest .; \
+		PYTHONPATH=$(pwd) uv run python -m coverage report -m; \
+		PYTHONPATH=$(pwd) uv run python -m coverage xml -o coverage.cobertura.xml; \
 	fi
 
 # =============================================================================
@@ -308,4 +311,4 @@ add_key_to_server:
 	@ssh ${SSH_DEPLOYMENT_USERNAME}@${SSH_DEPLOYMENT_HOST} 'mkdir -p ~/.ssh && chmod 700 ~/.ssh && touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys && cat >> ~/.ssh/authorized_keys' < ./github_ssh_key.pub
 	@echo "✅ Public key added to server!"
 
-.PHONY: help dev/up dev/down dev/build dev/rebuild dev/logs dev/shell db/up db/down db/reset db/backup db/restore manage migrate makemigrations shell collectstatic test test/unit test/integration test/coverage fe/install fe/dev fe/build prod/build prod/up prod/down prod/deploy ci/build ci/test ci/lint clean setup env generate_ssh create_github_secret add_key_to_server up down build logs exec up/db down/db up/prod down/prod
+.PHONY: help dev/up dev/down dev/build dev/rebuild dev/logs dev/shell db/up db/down db/reset db/backup db/restore manage migrate makemigrations shell collectstatic test test/unit test/integration test/coverage ci/migrate ci/test/coverage fe/install fe/dev fe/build prod/build prod/up prod/down prod/deploy ci/build ci/test ci/lint clean setup env generate_ssh create_github_secret add_key_to_server up down build logs exec up/db down/db up/prod down/prod

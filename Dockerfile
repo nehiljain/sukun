@@ -27,7 +27,7 @@ COPY pyproject.toml ./
 # Create virtual environment and install dependencies
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv venv && \
-    uv sync
+    uv sync --group dev
 
 # Development stage
 FROM base AS development

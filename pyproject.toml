@@ -63,7 +63,6 @@ dependencies = [
     "Pygments>=2.18.0",
     "configargparse",
     "python-Levenshtein>=0.26.0",
-    "playwright>=1.48.0",
     "whitenoise>=6.8.2",
     "gunicorn>=23.0.0",
     "resend>=2.4.0",
@@ -85,14 +84,6 @@ dependencies = [
     "assemblyai>=0.40.2",
     "pinecone>=7.3.0",
     "redis>=5.2.0",
-]
-
-[project.optional-dependencies]
-dev = [
-    "ruff>=0.6.5",
-    "pre-commit>=3.8.0",
-    "pytest>=8.3.3",
-    "pytest-anyio>=0.0.0",
 ]
 
 # UV specific configuration
@@ -136,4 +127,7 @@ dev = [
     "coverage>=7.8.0",
     "freezegun>=1.5.1",
     "pre-commit>=4.1.0",
+    "ruff>=0.6.5",
+    "pytest>=8.3.3",
+    "pytest-anyio>=0.0.0",
 ]
