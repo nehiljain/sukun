@@ -60,11 +60,11 @@ INSTALLED_APPS = [
     "oauth2_provider",
     "user_org",
     "common",
-    # "releases",
     "jsoneditor",
     "django_seed",
     "video_gen",
     "django_celery_results",
+    "task_api",
 ]
 
 MIDDLEWARE = [
@@ -271,7 +271,7 @@ CDN_BASE_URL = os.environ.get("CDN_BASE_URL")
 FALLBACK_BASE_URL = os.environ.get("FALLBACK_BASE_URL")
 
 
-CELERY_RESULT_BACKEND = "django-db"
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "django-db")
 CELERY_CACHE_BACKEND = "django-cache"
 CELERY_RESULT_EXTENDED = True
 

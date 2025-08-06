@@ -5,10 +5,12 @@ from celery import shared_task
 from common.email import send_email
 from django.conf import settings
 from django.utils import timezone
+from task_api.decorators import api_task
 
 logger = logging.getLogger(__name__)
 
 
+@api_task(["user_org.can_send_email"], "Send verification email to user")
 @shared_task(bind=True, max_retries=3, name="user_org.send_user_sign_up_email")
 def send_user_sign_up_email(self, user_id, verification_url):
     try:
