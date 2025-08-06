@@ -1,6 +1,7 @@
+from typing import List, Optional
+
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from typing import Optional, List
 
 User = get_user_model()
 

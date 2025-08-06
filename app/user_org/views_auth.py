@@ -11,7 +11,6 @@ from django.shortcuts import redirect
 from django.utils.crypto import get_random_string
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
-from rest_framework import status
 from user_org.models import AppUser, Membership, Organization, Workspace
 
 logger = logging.getLogger(__name__)
@@ -19,6 +18,7 @@ logger = logging.getLogger(__name__)
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
+
 
 def ensure_user_has_organization(app_user):
     # First check if the user is an AppUser

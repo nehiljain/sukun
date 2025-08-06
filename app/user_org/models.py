@@ -40,9 +40,7 @@ class AppUser(models.Model):
     stripe_price_id = models.CharField(max_length=100, blank=True, null=True)
     has_subscription_access = models.BooleanField(default=False)
     subscription_renewal_date = models.DateTimeField(null=True, blank=True)
-    active_org = models.ForeignKey(
-        "Organization", on_delete=models.CASCADE, null=True
-    )
+    active_org = models.ForeignKey("Organization", on_delete=models.CASCADE, null=True)
     auth_token = models.JSONField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -80,9 +78,7 @@ class Workspace(models.Model):
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE, related_name="projects"
     )
-    user = models.ForeignKey(
-        AppUser, on_delete=models.CASCADE, related_name="projects"
-    )
+    user = models.ForeignKey(AppUser, on_delete=models.CASCADE, related_name="projects")
     inputs = models.JSONField(null=True, blank=True)
 
     def clean(self):

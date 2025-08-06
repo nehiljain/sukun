@@ -1,13 +1,14 @@
 import io
 from unittest.mock import MagicMock, patch
 
-from common.file_utils import (
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase
+
+from ..file_utils import (
     convert_heic_to_png,
     convert_heic_to_png_file,
     get_new_filename,
 )
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
 
 
 class FileUtilsTestCase(TestCase):
@@ -80,17 +81,28 @@ class FileUtilsTestCase(TestCase):
         result = convert_heic_to_png(self.mock_heic_file)
         self.assertIsNone(result)  # Should return None on exception
 
-    @patch("common.file_utils.convert_heic_to_png")
-    def test_convert_heic_to_png_file(self, mock_convert):
+    @patch("common.file_utils.Image.open")
+    def test_convert_heic_to_png_file(self, mock_image_open):
         """Test the HEIC to SimpleUploadedFile conversion"""
-        # Create mock uploaded file and PNG buffer
+        # Setup mock PIL Image for RGB mode
+        mock_image_rgb = MagicMock()
+        mock_image_rgb.mode = "RGB"
+        mock_image_rgb.size = (100, 100)
+
+        # Configure save method to work properly
+        def mock_save(buffer, format):
+            buffer.write(b"mock_png_data")
+            return True
+
+        mock_image_rgb.save.side_effect = mock_save
+        mock_image_open.return_value = mock_image_rgb
+
+        # Create mock uploaded file
         mock_file = SimpleUploadedFile(
             name=self.mock_heic_filename,
             content=self.mock_heic_data,
             content_type="image/heic",
         )
-        mock_png_buffer = io.BytesIO(b"mock_png_data")
-        mock_convert.return_value = mock_png_buffer
 
         # Test successful conversion
         result = convert_heic_to_png_file(mock_file)
@@ -102,7 +114,7 @@ class FileUtilsTestCase(TestCase):
         self.assertEqual(result.content_type, "image/png")
 
         # Test exception handling
-        mock_convert.return_value = None  # Simulate conversion failure
+        mock_image_open.side_effect = Exception("Test error")
         result = convert_heic_to_png_file(mock_file)
         self.assertIsNone(result)  # Should return None on failure
 

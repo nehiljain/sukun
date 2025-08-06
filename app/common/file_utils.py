@@ -143,4 +143,3 @@ def convert_heic_to_png_file(file: SimpleUploadedFile) -> SimpleUploadedFile:
     except Exception as e:
         logger.error(f"Failed to convert HEIC file: {file.name} {e}")
         return None
-

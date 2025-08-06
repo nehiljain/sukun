@@ -168,7 +168,7 @@ class PropertyImageAnalyzer(ImageAnalyzer):
         results = []
 
         for i, image_source in enumerate(image_sources):
-            print(f"Analyzing image {i+1}/{len(image_sources)}: {image_source}")
+            print(f"Analyzing image {i + 1}/{len(image_sources)}: {image_source}")
             try:
                 result = self.analyze_property_image(image_source, is_url=are_urls)
                 results.append(result)

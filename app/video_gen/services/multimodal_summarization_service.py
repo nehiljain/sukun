@@ -212,7 +212,7 @@ class MultimodalSummarizationService:
                         frame_data,
                         {
                             **media_context,
-                            "frame_position": f"frame {i+1}/{len(timestamps)} at {timestamp:.1f}s",
+                            "frame_position": f"frame {i + 1}/{len(timestamps)} at {timestamp:.1f}s",
                         },
                     )
                     if frame_summary:

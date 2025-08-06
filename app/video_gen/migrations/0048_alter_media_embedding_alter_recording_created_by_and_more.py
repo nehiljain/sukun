@@ -6,26 +6,36 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('user_org', '0010_sourcecodeprovider_appuser_alter_membership_user_and_more'),
-        ('video_gen', '0047_alter_media_embedding_for_qwen8'),
+        ("user_org", "0010_sourcecodeprovider_appuser_alter_membership_user_and_more"),
+        ("video_gen", "0047_alter_media_embedding_for_qwen8"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='media',
-            name='embedding',
-            field=pgvector.django.vector.VectorField(blank=True, dimensions=1024, help_text='Vector embedding for semantic search (text-embedding-3-large)', null=True),
+            model_name="media",
+            name="embedding",
+            field=pgvector.django.vector.VectorField(
+                blank=True,
+                dimensions=1024,
+                help_text="Vector embedding for semantic search (text-embedding-3-large)",
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='recording',
-            name='created_by',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='recordings', to='user_org.appuser'),
+            model_name="recording",
+            name="created_by",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="recordings",
+                to="user_org.appuser",
+            ),
         ),
         migrations.AlterField(
-            model_name='room',
-            name='created_by',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='user_org.appuser'),
+            model_name="room",
+            name="created_by",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="user_org.appuser"
+            ),
         ),
     ]
