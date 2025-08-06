@@ -45,7 +45,7 @@ jobs:
 
       - name: Install dependencies and run linting
         run: |
-          uv sync --dev
+          uv pip install ruff
           uv run ruff check app/
           uv run ruff format --check app/
 
