@@ -3,14 +3,15 @@
 This is an opnionated version of [Shipfast](https://shipfa.st/). More details about the high level architecture is at [Architecture](ARCHITECTURE.md)
 
 ## Table of Contents
+
 - [Who should use it?](#who-should-use-it)
 - [Features](#features)
 - [Prerequisites](#prerequisites)
 - [Local Setup](#local-setup)
 - [Deployment](#deployment)
 
-
 ## Who should use it?
+
 - Want to build a python based webapp.
 - You want to quickly go to production with a SaaS idea.
 - You want to build an internal web tool for your company.
@@ -18,6 +19,7 @@ This is an opnionated version of [Shipfast](https://shipfa.st/). More details ab
 ## Features
 
 App Features:
+
 - [x] RESTFul API backend with Swagger docs.
 - [x] Simple Frontend Stack - Vite.js, React.
 - [x] Email Flows
@@ -28,29 +30,33 @@ App Features:
 - [ ] Celery Hook with N8N for workflow automation
 
 DX Features:
+
 - [x] Continuous deployment (Github)
 - [x] Notion <> DB Integration
 - [x] Frontend Hot Reloading
 
 Deployment and Infra Features:
+
 - [ ] Public S3 bucket + CDN for storing assets
 - [ ] Deployment to Fly.io
 - [ ] Deployment to AWS Fargate
 
 Monitoring and Observability:
+
 - [x] PostHog Analytics
 - [ ] LLM Tracing with LangSmith?
 - [ ] Log forwarding to NewRelic
 - [ ] Service Uptime Monitoring with NewRelic
 
-
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
+
 - Docker
 - Git
 
 Following SaaS services are needed to operate this:
+
 - Resend
 - Stripe
 - Hosted Postgres
@@ -60,6 +66,7 @@ Following SaaS services are needed to operate this:
 1. Clone the repository.
 
 2. Update the environment variables.
+
    - Copy `.env.example` to `.env`
    - Update the `.env` file with your specific configuration
 
@@ -69,15 +76,22 @@ Following SaaS services are needed to operate this:
    make dev/up
    make manage COMMAND=migrate
    ```
+
 4. (Optional) Start the frontend development server with hot reloading:
    ```sh
    make fe/dev
    ```
-5. App is running at http://localhost:8000/
+5. App is running at http://localhost:8000/ . Access the Swagger API docs at http://localhost:8000/api/docs/
+
+6. If you want to commit code, install pre-commit hooks:
+   ```sh
+   pre-commit install
+   ```
 
 ## Deployment (WIP)
 
 This application can be deployed in 3 ways:
+
 1. Self Managed VM (AWS, GCP, OVHCloud )
 2. Serverless - Fargate, Fly.io
 

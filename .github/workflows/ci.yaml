@@ -45,9 +45,9 @@ jobs:
 
       - name: Install dependencies and run linting
         run: |
-          uv pip install ruff
-          uv run ruff check app/
-          uv run ruff format --check app/
+          pip install ruff
+          ruff check app/
+          ruff format --check app/
 
   # Check for changes to determine what to test
   changes:
@@ -89,7 +89,7 @@ jobs:
     env:
       PYTHONUNBUFFERED: 1
       POSTGRES_PASSWORD: very-complex-passwOrd
-      APP_DATABASE_URL: postgresql://postgres:very-complex-passwOrd@127.0.0.1:5432/postgres
+      APP_DATABASE_URL: postgresql://postgres:very-complex-passwOrd@db:5432/postgres
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       VITE_REACT_APP_PUBLIC_POSTHOG_KEY: ${{ secrets.VITE_REACT_APP_PUBLIC_POSTHOG_KEY }}
       VITE_NEXT_PUBLIC_PEXELS_API_KEY: ${{ secrets.VITE_NEXT_PUBLIC_PEXELS_API_KEY }}
@@ -131,20 +131,11 @@ jobs:
 
       - name: Run migrations
         run: |
-          docker run --rm --network container:$(docker compose ps -q db) \
-            -e DATABASE_URL=postgresql://postgres:very-complex-passwOrd@127.0.0.1:5432/gestral \
-            gestral:test python app/manage.py migrate
+          RUNTIME=docker make manage COMMAND=migrate
 
       - name: Run tests with coverage
         run: |
-          docker run --rm --network container:$(docker compose ps -q db) \
-            -e DATABASE_URL=postgresql://postgres:very-complex-passwOrd@127.0.0.1:5432/gestral \
-            -v $PWD:/workspace \
-            gestral:test bash -c "
-              python -m coverage run --source=app -m pytest app/ -v --tb=short &&
-              python -m coverage report -m &&
-              python -m coverage xml -o /workspace/coverage.cobertura.xml
-            "
+          RUNTIME=docker make test/coverage
 
       - name: Code Coverage Summary Report
         uses: irongut/CodeCoverageSummary@v1.3.0
