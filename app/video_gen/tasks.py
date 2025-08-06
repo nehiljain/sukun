@@ -13,6 +13,7 @@ from common.storage.utils import upload_file_to_cloud
 from django.conf import settings
 from django.utils import timezone
 from pydantic import BaseModel
+from task_api.decorators import api_task
 from video_gen.services.ffmpeg_service import FFMPEGService
 
 logger = logging.getLogger(__name__)
@@ -252,6 +253,7 @@ def execute_render(self, render_video_id, render_token):
         return False
 
 
+@api_task(["video_gen.can_send_email"], "Send email notification when video is ready")
 @shared_task(bind=True, max_retries=3, name="video_gen.send_video_ready_email")
 def send_video_ready_email(self, render_video_id):
     """

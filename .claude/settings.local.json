@@ -19,7 +19,8 @@
       "Bash(uv lock:*)",
       "Bash(cp:*)",
       "Bash(find:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(DJANGO_SETTINGS_MODULE=settings python -m django makemigrations task_api)"
     ],
     "deny": []
   }

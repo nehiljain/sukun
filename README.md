@@ -26,14 +26,14 @@ App Features:
 - [x] Authentication (Google)
 - [x] Stripe Integration for Subscriptions
 - [x] Async Job Queues with Celery
+- [x] Celery Tasks available via API (Hook into workflow automation like N8N)
 - [ ] Simple Product Blog with CMS
-- [ ] Celery Hook with N8N for workflow automation
 
 DX Features:
 
 - [x] Continuous deployment (Github)
-- [x] Notion <> DB Integration
 - [x] Frontend Hot Reloading
+- [x] Jupyter <> DB Integration
 
 Deployment and Infra Features:
 

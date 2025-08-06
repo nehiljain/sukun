@@ -66,6 +66,7 @@ urlpatterns += [
     path("", include("video_gen.urls")),
     # path("", include("sound_gen.urls")),
     path("", include("user_org.urls")),
+    path("api/tasks/", include("task_api.urls")),
     # Catch-all route - must be last
     re_path(r".*", app_noauth_page, name="app"),
 ]
