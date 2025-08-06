@@ -373,4 +373,3 @@ class OpenAIAgentService:
                 message="I apologize, but I encountered an error processing your request. Please try again.",
                 timestamp=datetime.utcnow().isoformat(),
             )
-

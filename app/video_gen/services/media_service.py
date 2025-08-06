@@ -258,6 +258,7 @@ class MediaService:
         """Perform semantic search using pgvector similarity search in database"""
         try:
             from pgvector.django import CosineDistance
+
             from app.video_gen.services.embedding import create_embedding_service
 
             # Generate embedding for the search query (keeping it generic)
@@ -319,13 +320,13 @@ class MediaService:
                     distance = float(media.distance)
                     similarity = 1.0 - distance
                     logger.info(
-                        f"    {i+1:2d}. {media.name[:50]:<50} | Distance: {distance:.4f} | Similarity: {similarity:.4f}"
+                        f"    {i + 1:2d}. {media.name[:50]:<50} | Distance: {distance:.4f} | Similarity: {similarity:.4f}"
                     )
                 except AttributeError as e:
-                    logger.error(f"    {i+1:2d}. {media.name[:50]:<50} | ERROR: {e}")
+                    logger.error(f"    {i + 1:2d}. {media.name[:50]:<50} | ERROR: {e}")
                 except Exception as e:
                     logger.error(
-                        f"    {i+1:2d}. {media.name[:50]:<50} | UNEXPECTED ERROR: {e}"
+                        f"    {i + 1:2d}. {media.name[:50]:<50} | UNEXPECTED ERROR: {e}"
                     )
 
             if len(all_results_with_distances) == 0:

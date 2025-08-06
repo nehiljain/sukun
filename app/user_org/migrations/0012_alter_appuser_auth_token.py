@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('user_org', '0001_squashed_0011_alter_appuser_auth_token'),
+        ("user_org", "0001_squashed_0011_alter_appuser_auth_token"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='appuser',
-            name='auth_token',
+            model_name="appuser",
+            name="auth_token",
             field=models.JSONField(blank=True, null=True),
         ),
     ]

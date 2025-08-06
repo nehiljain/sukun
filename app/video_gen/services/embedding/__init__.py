@@ -1,9 +1,9 @@
 import os
 
 from .base_embedding_service import BaseEmbeddingService
-from .postgres_openai_embedding_service import PostgresOpenAIEmbeddingService
 from .pinecone_openai_embedding_service import PineconeOpenAIEmbeddingService
 from .postgres_local_embedding_service import PostgresLocalEmbeddingService
+from .postgres_openai_embedding_service import PostgresOpenAIEmbeddingService
 
 
 def create_embedding_service(service_type: str = None) -> BaseEmbeddingService:
@@ -35,7 +35,7 @@ def create_embedding_service(service_type: str = None) -> BaseEmbeddingService:
 
 __all__ = [
     "BaseEmbeddingService",
-    "PostgresOpenAIEmbeddingService", 
+    "PostgresOpenAIEmbeddingService",
     "PineconeOpenAIEmbeddingService",
     "PostgresLocalEmbeddingService",
     "create_embedding_service",

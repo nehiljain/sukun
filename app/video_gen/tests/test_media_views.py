@@ -4,10 +4,9 @@ from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
-from user_org.models import AppUser
 from rest_framework import status
 from rest_framework.test import APIClient
-from user_org.models import Organization
+from user_org.models import AppUser, Organization
 from video_gen.models import Media
 
 

@@ -8,14 +8,13 @@ from django.db import transaction
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
 from django.views.decorators.csrf import csrf_exempt
-from user_org.models import AppUser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from user_org.models import Membership, Organization, Workspace
+from user_org.models import AppUser, Membership, Organization, Workspace
 
 logger = logging.getLogger(__name__)
+
 
 def ensure_user_has_organization(app_user):
     # First check if the user is an AppUser
@@ -43,6 +42,7 @@ def ensure_user_has_organization(app_user):
         return org
     return None
 
+
 def ensure_user_is_stripe_customer(app_user):
     if not app_user.stripe_customer_id:
         # Create a new Stripe customer
@@ -51,6 +51,7 @@ def ensure_user_is_stripe_customer(app_user):
         app_user.stripe_customer_id = customer.id
         app_user.save()
     return app_user.stripe_customer_id
+
 
 @csrf_exempt
 def stripe_webhook_handler(request):

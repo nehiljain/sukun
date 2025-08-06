@@ -330,6 +330,7 @@ class VideoProjectViewSet(viewsets.ModelViewSet):
 
             # Example of registering a custom tool just for this request
             # This tool will be available alongside the default tools
+            agent_service = OpenAIAgentService()
             agent_service.register_tool(
                 name="update_project_name",
                 description="Update the name of the video project",

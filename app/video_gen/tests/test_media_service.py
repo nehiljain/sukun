@@ -6,8 +6,7 @@ from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from freezegun import freeze_time
-from user_org.models import AppUser
-from user_org.models import Organization
+from user_org.models import AppUser, Organization
 from video_gen.models import Media
 from video_gen.services.media_service import MediaService
 

@@ -4,10 +4,9 @@ from unittest.mock import patch
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
-from user_org.models import AppUser
 from rest_framework import status
 from rest_framework.test import APIClient
-from user_org.models import AnonymousSession, Organization, Workspace
+from user_org.models import AnonymousSession, AppUser, Organization, Workspace
 from video_gen.models import AspectRatio, VideoProject
 from video_gen.services.video_project_service import ChatMessage
 

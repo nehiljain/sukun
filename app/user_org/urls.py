@@ -6,6 +6,7 @@ from .views import (
     UpdateAnonymousSessionEmailView,
     WorkspaceViewSet,
 )
+from .views_subscriptions import SubscriptionPlansView, stripe_webhook_handler
 from .views_users import (
     ResendVerificationView,
     TokenView,
@@ -14,14 +15,12 @@ from .views_users import (
     VerifyEmailView,
 )
 
-from .views_subscriptions import SubscriptionPlansView, stripe_webhook_handler
-
 router = DefaultRouter()
 router.register(r"workspaces", WorkspaceViewSet, basename="workspaces")
 router.register(r"organizations", OrganizationViewSet, basename="organizations")
 urlpatterns = [
     path("api/", include(router.urls)),
-        path("api/webhook/stripe/", stripe_webhook_handler, name="stripe-webhook"),
+    path("api/webhook/stripe/", stripe_webhook_handler, name="stripe-webhook"),
     path(
         "api/subscription-plans/",
         SubscriptionPlansView.as_view(),

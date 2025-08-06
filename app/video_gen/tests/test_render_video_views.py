@@ -5,10 +5,9 @@ from unittest.mock import MagicMock, patch
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
-from user_org.models import AppUser
 from rest_framework import status
 from rest_framework.test import APIClient
-from user_org.models import Organization
+from user_org.models import AppUser, Organization
 from video_gen.models import AspectRatio, RenderVideo, VideoProject
 
 
