@@ -246,7 +246,7 @@ AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
 AWS_STORAGE_PRIVATE_BUCKET_NAME = os.environ.get("AWS_STORAGE_PRIVATE_BUCKET_NAME")
 AWS_REGION = os.environ.get("AWS_REGION", "us-west-1")
 
-BACKUP_DIR = os.path.join(BASE_DIR, "failed_uploads")
+BACKUP_DIR = os.path.join(BASE_DIR, "/tmp/failed_uploads")
 
 # Create backup directory if it doesn't exist
 os.makedirs(BACKUP_DIR, exist_ok=True)
