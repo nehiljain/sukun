@@ -56,7 +56,6 @@ export const ChatMessage = memo(
               {/* Render rich text HTML, allow only safe tags */}
               <div
                 className="rich-text break-words whitespace-pre-line text-base leading-relaxed"
-                // eslint-disable-next-line react/no-danger
                 dangerouslySetInnerHTML={{ __html: message.message }}
               />
               {hasUsedTools && (

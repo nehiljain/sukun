@@ -146,13 +146,12 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 
-STATIC_ROOT = os.path.join(
-    os.path.join(os.path.dirname(BASE_DIR), "public"), "staticfiles"
-)
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 if not DEBUG:
     STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "../static"),
+    os.path.join(os.path.dirname(BASE_DIR), "static"),  # Vite builds to ../static
 ]
 
 # Default primary key field type

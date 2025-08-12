@@ -1,15 +1,12 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Github, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import Footer from "@/components/shared/Footer";
 import Navbar from "@/components/shared/Navbar";
 
 export default function LandingPage() {
   const baseUrl = `${window.location.protocol}//${window.location.host}/api`;
-  const [email, setEmail] = useState("");
-  const [isValidEmail, setIsValidEmail] = useState(true);
-  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const { isAuthenticated } = useAuth();
 
@@ -56,7 +53,7 @@ export default function LandingPage() {
           <div className="max-w-6xl mx-auto px-6">
             <h2 className="text-xl text-secondary-foreground text-center mb-12">
               <p className="text-muted-foreground mt-2 mb-8">
-                We'll sign you in asd sd ssd sds in, or create an account if you don't have one
+                We'll sign you in or create an account if you don't have one
                 yet.
               </p>
               <div className="flex flex-col gap-4 items-center">

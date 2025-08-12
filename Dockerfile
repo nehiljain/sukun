@@ -17,7 +17,10 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     build-essential \
     ca-certificates \
     ffmpeg \
-    curl && \
+    curl \
+    nodejs \
+    npm && \
+    npm install -g yarn && \
     pip install uv && \
     rm -rf /var/lib/apt/lists/*
 
@@ -68,6 +71,19 @@ CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 # Production builder stage
 FROM base AS builder
 
+# Copy frontend code and build it first
+COPY web ./web
+# COPY package.json yarn.lock* ./
+
+# Build frontend assets
+WORKDIR /app/web
+RUN mkdir ../static && \
+    yarn install --frozen-lockfile && \
+    yarn build
+
+# Go back to app directory
+WORKDIR /app
+
 # Copy application code for static file collection
 COPY app .
 
@@ -75,9 +91,10 @@ COPY app .
 ENV PATH="/app/.venv/bin:$PATH" \
     DJANGO_SETTINGS_MODULE=settings
 
-# Collect static files
-RUN . .venv/bin/activate && \
-    python manage.py collectstatic --noinput --clear || echo "Static files collection failed, continuing..."
+# Create static directory and collect static files (including frontend assets)
+RUN mkdir -p /app/static && \
+    . .venv/bin/activate && \
+    python manage.py collectstatic --noinput
 
 # Production stage
 FROM python:3.12-slim AS production
@@ -85,14 +102,11 @@ FROM python:3.12-slim AS production
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PATH="/app/.venv/bin:$PATH"
+    PATH="/app/.venv/bin:$PATH" \
+    DJANGO_SETTINGS_MODULE=settings
 
 # Set working directory
 WORKDIR /app
-
-# Create non-root user
-RUN groupadd --gid 1001 django && \
-    useradd --uid 1001 --gid django --shell /bin/bash --create-home django
 
 # Install minimal runtime dependencies
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -106,13 +120,17 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     rm -rf /var/lib/apt/lists/*
 
 # Copy virtual environment from builder
-COPY --from=builder --chown=django:django /app/.venv /app/.venv
+COPY --from=builder /app/.venv /app/.venv
+
+# Create non-root user
+RUN groupadd --gid 1001 django && \
+    useradd --uid 1001 --gid django --shell /bin/bash --create-home django
 
 # Copy application code
 COPY --chown=django:django app .
 
-# Copy static files if they exist
-COPY --from=builder --chown=django:django /app/static /app/static 2>/dev/null || true
+# Copy static files
+COPY --from=builder --chown=django:django /app/static /app/static
 
 # Change to non-root user
 USER django
@@ -125,4 +143,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/ || exit 1
 
 # Run application with gunicorn
-CMD ["gunicorn", "--config", "gunicorn.py", "wsgi"]
+CMD ["/app/.venv/bin/python", "-m", "gunicorn","app.wsgi:application"]

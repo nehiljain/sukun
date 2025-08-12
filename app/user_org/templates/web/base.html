@@ -22,7 +22,7 @@
                                 connect-src 'self' https://api.pexels.com/ https://us.i.posthog.com https://storage.googleapis.com https://dev-assets.demodrive.tech https://stage-assets.demodrive.tech https://prod-assets.demodrive.tech;
                                 img-src 'self' data: https: blob:;
                                 font-src 'self' data: https:;
-                                media-src 'self' data: blob: https://videos.pexels.com/ https://rwxrdxvxndclnqvznxfj.supabase.co/ blob:https://app.demodrive.tech/ https://app.demodrive.tech https://commondatastorage.googleapis.com https://storage.googleapis.com https://dev-assets.demodrive.tech https://stage-assets.demodrive.tech https://prod-assets.demodrive.tech;{% endif %}">
+                                media-src 'self' data: blob: https://videos.pexels.com/ https://rwxrdxvxndclnqvznxfj.supabase.co/ https://commondatastorage.googleapis.com https://storage.googleapis.com https://dev-assets.demodrive.tech;{% endif %}">
 
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
 
@@ -45,6 +45,7 @@
     {% else %}
       <!-- Production assets -->
       <link rel="stylesheet" href="{% static 'main.css' %}" />
+      <script type="module" src="{% static 'index-bundle.js' %}"></script>
     {% endif %}
     {% block meta %} {%endblock %}
   </head>

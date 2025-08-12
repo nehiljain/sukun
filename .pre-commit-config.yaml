@@ -49,6 +49,16 @@ repos:
       - id: prettier
         types_or: [javascript, jsx, ts, tsx, json, css, scss, markdown]
 
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint
+        entry: bash -c "cd web && yarn lint --fix"
+        language: system
+        types_or: [javascript, jsx, ts, tsx]
+        pass_filenames: false
+        always_run: true
+        files: ^web/
 
   - repo: local
     hooks:

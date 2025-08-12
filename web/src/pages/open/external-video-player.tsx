@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { useParams } from "react-router-dom";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";

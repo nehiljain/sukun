@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardTitle,
-  CardDescription,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -17,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import Loader from "@/components/shared/loader";
 import { SuccessToast, ErrorToast } from "@/components/CustomToast";
 import { Minus, Plus } from "lucide-react";

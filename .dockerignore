@@ -1,7 +1,9 @@
 fly.toml
+__pycache__
 .git/
 *.sqlite3
 .venv
+.env
 node_modules
 video_processing/
 langgraph-agent/

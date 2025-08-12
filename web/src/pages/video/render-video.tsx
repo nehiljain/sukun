@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
-import { Download, ExternalLink, Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 
 // API
 import { ddApiClient } from "@/lib/api-client";

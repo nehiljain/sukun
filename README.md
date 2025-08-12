@@ -88,29 +88,37 @@ Following SaaS services are needed to operate this:
    pre-commit install
    ```
 
-## Deployment (WIP)
+## Deployment
 
 This application can be deployed in 3 ways:
 
-1. Self Managed VM (AWS, GCP, OVHCloud )
-2. Serverless - Fargate, Fly.io
+1. PaaS - Fly.io, Beanstalk.
+2. Kubernetes
+3. Self Managed VM (AWS, GCP, OVHCloud)
 
-For both pathways, the instructions are the same, except the terraform code to apply:
+### Using Fly.io
 
-1. Update the .tfvars files with the necessary credentials.
+https://gestral.fly.dev/
 
-2. Run terraform to provision the infrastructure.
+1. Create a Fly.io account.
+2. Install the Fly CLI.
 
-```sh
-cd infra/<aws-fargate|aws-vm>/
-terraform plan
-terraform apply
-```
+   ```sh
+   curl -L https://fly.io/install.sh | sh
+   ```
 
-3. Push the infra details (IPs, Access Keys etc) to Github Secrets.
+3. Configure secrets.
 
-```sh
-make update_ci
-```
+   ```sh
+   fly secrets set APP_DATABASE_URL=<your-database-url>
+   fly secrets set APP_REDIS_URL=<your-redis-url>
+   fly secrets set APP_STRIPE_SECRET
+   ```
 
-4. Deploy the application, by simply running github CI and CD.
+4. Deploy the application.
+
+   ```sh
+   fly deploy
+   ```
+
+### Using AWS Fargate + AWS EKS (WIP)
