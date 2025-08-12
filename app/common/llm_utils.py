@@ -3,13 +3,11 @@ import os
 from typing import Any, Dict, Optional
 
 import tiktoken
-from langchain.globals import set_llm_cache
-from langchain_community.cache import SQLiteCache
 from langchain_core.messages import HumanMessage
 from langchain_fireworks import ChatFireworks
 from langchain_openai import ChatOpenAI
 
-set_llm_cache(SQLiteCache(database_path=".langchain.db"))
+# set_llm_cache(SQLiteCache(database_path=".langchain.db"))
 
 
 FIREFUNC_MODEL: str = "accounts/fireworks/models/firefunction-v2"

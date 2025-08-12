@@ -56,7 +56,7 @@ export default function LandingPage() {
           <div className="max-w-6xl mx-auto px-6">
             <h2 className="text-xl text-secondary-foreground text-center mb-12">
               <p className="text-muted-foreground mt-2 mb-8">
-                We'll sign you in asd sd ssd sds in, or create an account if you don't have one
+                We'll sign you in or create an account if you don't have one
                 yet.
               </p>
               <div className="flex flex-col gap-4 items-center">

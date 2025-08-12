@@ -1,7 +1,7 @@
 import multiprocessing
 
 bind = "0.0.0.0:8000"
-chdir = "app/"
+chdir = "./"
 reload = True
 timeout = 600
 workers = multiprocessing.cpu_count()

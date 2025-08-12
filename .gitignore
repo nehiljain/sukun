@@ -44,7 +44,6 @@ logs/
 .env_lg
 .env_staging
 .env_prod
-app/client/.env
 
 # media files
 *.cast
@@ -105,3 +104,8 @@ infra/ami-builder/output/
 
 failed_uploads/
 infra/
+
+.coverage
+coverage.cobertura.xml
+
+.pytest_cache/
