@@ -13,10 +13,10 @@ export default function Footer() {
                 className="h-8 w-auto"
               />
             </Link>
-            <span className="text-xl font-semibold">DemoDrive</span>
+            <span className="text-xl font-semibold">Gestral</span>
           </div>
           <nav className="flex flex-wrap justify-center md:justify-end gap-6">
-            <Link to="mailto:founders@demodrive.tech">Support</Link>
+            <Link to="mailto:team@19bits.com">Support</Link>
             <Link to="/terms" className="hover:underline">
               Terms
             </Link>
@@ -26,7 +26,7 @@ export default function Footer() {
           </nav>
         </div>
         <div className="mt-8 text-center text-sm text-gray-600">
-          © 2025 DemoDrive by 19Bits Inc. All rights reserved.
+          © 2025 Gestral by 19Bits Inc. All rights reserved.
         </div>
       </div>
     </footer>

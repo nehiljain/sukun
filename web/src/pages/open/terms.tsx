@@ -30,9 +30,9 @@ export const Terms: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="mb-4">
-                    Welcome to DemoDrive AI, a product owned and operated by
-                    19bits Inc. ("we," "us," or "our"), a company incorporated
-                    in Canada. By accessing or using the DemoDrive AI services,
+                    Welcome to Gestral, a product owned and operated by 19bits
+                    Inc. ("we," "us," or "our"), a company incorporated in
+                    Canada. By accessing or using the Gestral AI services,
                     website, and related applications (collectively referred to
                     as the "Service"), you ("you" or "User") agree to comply
                     with and be bound by these Terms and Conditions ("Terms").

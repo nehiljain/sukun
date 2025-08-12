@@ -29,8 +29,8 @@ export const Privacy: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="mb-4">
-                    At DemoDrive AI, owned and operated by 19bits Inc., we take
-                    your privacy seriously. This Privacy Policy explains how we
+                    At Gestral, owned and operated by 19bits Inc., we take your
+                    privacy seriously. This Privacy Policy explains how we
                     collect, use, and protect your personal information when you
                     use our services.
                   </p>
