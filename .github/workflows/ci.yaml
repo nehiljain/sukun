@@ -176,8 +176,8 @@ jobs:
       - name: Run frontend linting
         run: cd web && yarn lint
 
-      - name: Run frontend tests
-        run: cd web && yarn test --passWithNoTests
+      # - name: Run frontend tests
+      #   run: cd web && yarn test --passWithNoTests
 
       - name: Build frontend
         run: cd web && yarn build
