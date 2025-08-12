@@ -1,27 +1,20 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
-import { Home } from "lucide-react";
+import { Home, LucideIcon } from "lucide-react";
 
 interface NavButton {
   label: string;
-  icon: React.ElementType;
+  icon?: LucideIcon;
   onClick: () => void;
-  variant: "primary" | "secondary";
+  variant?: "default" | "primary" | "secondary" | "ghost" | "link";
 }
 const NotFound = () => {
   const navigate = useNavigate();
 
   const handleGoHome = () => {
     navigate("/");
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      handleGoHome();
-    }
   };
 
   const navButtons: NavButton[] = [

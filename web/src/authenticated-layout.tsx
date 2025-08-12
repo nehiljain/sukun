@@ -26,7 +26,6 @@ const AuthenticatedLayout: React.FC = () => {
 
   // If not authenticated, redirect to home page
   if (!isAuthenticated) {
-    debugger;
     setTimeout(() => {
       posthog.capture("unauthenticated_access", {
         path: location.pathname,

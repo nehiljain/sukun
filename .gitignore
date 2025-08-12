@@ -109,3 +109,4 @@ infra/
 coverage.cobertura.xml
 
 .pytest_cache/
+.vite/

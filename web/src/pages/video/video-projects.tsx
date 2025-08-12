@@ -24,7 +24,7 @@ interface PaginatedResponse {
 
 export default function VideoProjects() {
   const [videoProjects, setVideoProjects] = useState<IVideoProject[]>([]);
-  const [brandAssets, setBrandAssets] = useState<IBrandAsset[]>([]);
+  const [setBrandAssets] = useState<IBrandAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCreatingProject, setIsCreatingProject] = useState(false);
