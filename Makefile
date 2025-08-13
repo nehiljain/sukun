@@ -157,27 +157,27 @@ test:
 test/unit:
 	@echo "🧪 Running unit tests..."
 	@if [ "$(RUNTIME)" = "docker" ]; then \
-		docker compose run --rm web python -m pytest . -v -m "not integration"; \
+		docker compose run --rm -e DJANGO_SETTINGS_MODULE=settings web python manage.py test; \
 	else \
-		uv run python -m pytest . -v -m "not integration"; \
+		cd app && PYTHONPATH=$(pwd) uv run python manage.py test; \
 	fi
 
 test/integration:
 	@echo "🧪 Running integration tests..."
 	@if [ "$(RUNTIME)" = "docker" ]; then \
-		docker compose run --rm web python -m pytest . -v -m integration; \
+		docker compose run --rm -e DJANGO_SETTINGS_MODULE=settings web python manage.py test; \
 	else \
-		uv run python -m pytest . -v -m integration; \
+		cd app && PYTHONPATH=$(pwd) uv run python manage.py test; \
 	fi
 
 test/coverage:
 	@echo "🧪 Running tests with coverage..."
 	@if [ "$(RUNTIME)" = "docker" ]; then \
-		docker compose run --rm web bash -c "python -m coverage run --source=app -m pytest . && python -m coverage report -m && python -m coverage xml -o coverage.cobertura.xml"; \
+		docker compose run --rm -e DJANGO_SETTINGS_MODULE=settings web bash -c "python -m coverage run --source=app manage.py test && python -m coverage report -m && python -m coverage xml -o coverage.cobertura.xml"; \
 	else \
-		cd app && PYTHONPATH=$(pwd) uv run python -m coverage run --source=app -m pytest .; \
-		PYTHONPATH=$(pwd) uv run python -m coverage report -m; \
-		PYTHONPATH=$(pwd) uv run python -m coverage xml -o coverage.cobertura.xml; \
+		cd app && PYTHONPATH=$(pwd) uv run python -m coverage run --source=app manage.py test; \
+		cd app && PYTHONPATH=$(pwd) uv run python -m coverage report -m; \
+		cd app && PYTHONPATH=$(pwd) uv run python -m coverage xml -o coverage.cobertura.xml; \
 	fi
 
 # =============================================================================
@@ -242,7 +242,7 @@ ci/test:
 		-e DJANGO_SETTINGS_MODULE=settings \
 		-e DATABASE_URL=sqlite:///test.db \
 		$(PROJECT_NAME):ci \
-		python -m pytest app/ --tb=short -q
+		python manage.py test
 	@echo "✅ CI tests complete!"
 
 ci/lint:
