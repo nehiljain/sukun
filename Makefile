@@ -149,9 +149,9 @@ test:
 	@echo "🧪 Running tests..."
 	@if [ "$(RUNTIME)" = "docker" ]; then \
 		echo "Using Docker runtime for tests..."; \
-		docker compose run --rm -e DJANGO_SETTINGS_MODULE=settings web python -m pytest . -v; \
+		docker compose run --rm -e DJANGO_SETTINGS_MODULE=settings web python manage.py test; \
 	else \
-		cd app && PYTHONPATH=$(pwd) uv run python -m pytest . -v; \
+		cd app && PYTHONPATH=$(pwd) uv run python manage.py test; \
 	fi
 
 test/unit:
