@@ -1,0 +1,34 @@
+# Application configuration
+app_name        = "gestral"
+deployment_name = "apprunner-dev"  # Change this for each deployment
+aws_region      = "us-west-2"
+
+# Database configuration
+db_password = "..........."
+
+# Django configuration
+django_secret_key = "................."
+django_debug      = "False"
+
+# Domain configuration (update these based on your deployment)
+allowed_hosts         = "*.awsapprunner.com,yourdomain.com"
+cors_allowed_origins  = "https://yourdomain.com"
+csrf_trusted_origins  = "https://yourdomain.com"
+
+# Container image (replace with your actual ECR repository URI after running deploy script)
+# Get this from: aws sts get-caller-identity to find your account ID
+# Format: {account-id}.dkr.ecr.{region}.amazonaws.com/gestral-{deployment-name}:latest
+container_image_uri = "public.ecr.aws/docker/library/nginx:latest"  # Temporary placeholder
+
+# App Runner configuration (adjust based on your needs)
+apprunner_cpu    = "0.25 vCPU"
+apprunner_memory = "0.5 GB"
+max_concurrency  = 100
+max_size         = 10
+min_size         = 1
+
+# Auto deployments (disabled by default due to ECR account restrictions)
+auto_deployments_enabled = false
+
+# Infrastructure sizing
+db_instance_class = "db.t3.micro"

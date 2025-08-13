@@ -11,10 +11,16 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
+import warnings
 from pathlib import Path
 
 import environ
 from dotenv import load_dotenv
+
+# Suppress protobuf version mismatch warnings
+warnings.filterwarnings(
+    "ignore", message=".*Protobuf gencode version.*", category=UserWarning
+)
 
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

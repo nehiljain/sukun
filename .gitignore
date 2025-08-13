@@ -110,3 +110,14 @@ coverage.cobertura.xml
 
 .pytest_cache/
 .vite/
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+
+.terraform
+terraform.tfstate
+.terraform.lock.hcl
+terraform.tfvars
+terraform.tfstate.backup
