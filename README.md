@@ -39,9 +39,8 @@ Deployment and Infra Features:
 
 - ✅ Deployment to Fly.io
 - ✅ Deployment to AWS App Runner
-- [] Deployment to AWS EC2
 - [ ] Public S3 bucket + CDN for storing assets
-- [ ] Deployment to AWS Fargate
+- [ ] Deployment to AWS EC2
 
 Monitoring and Observability:
 
@@ -92,15 +91,17 @@ Following SaaS services are needed to operate this:
 
 ## Deployment
 
-This application can be deployed in 4 ways:
+This application can be deployed in 3 ways:
 
-1. PaaS - Fly.io, AWS App Runner
-2. Kubernetes
+1. PaaS - Fly.io,
+2. PaaS - AWS App Runner
 3. Self Managed VM (AWS, GCP, OVHCloud)
 
 ### Using Fly.io
 
-https://gestral.fly.dev/
+This section expects that a publicly accessible Postgres database is available. You can use services like [Supabase](https://supabase.com/) or [Neon](https://neon.tech/) for this.
+
+Video Tutorial: https://1drv.ms/v/c/b345fdd8ccc30f21/EaUDWF2-oiVCr1fFFg3UQ3cBrfp4gOMhVL5POHv2wIKZJg?e=dlGHdd
 
 1. Create a Fly.io account.
 2. Install the Fly CLI.
@@ -109,15 +110,22 @@ https://gestral.fly.dev/
    curl -L https://fly.io/install.sh | sh
    ```
 
-3. Configure secrets.
+3. Create a new Fly application.
 
    ```sh
-   fly secrets set APP_DATABASE_URL=<your-database-url>
-   fly secrets set APP_REDIS_URL=<your-redis-url>
-   fly secrets set APP_STRIPE_SECRET
+   fly create app_name
    ```
 
-4. Deploy the application.
+4. Configure secrets and update fly.toml with your environment variables.
+
+   ```sh
+   fly secrets --app app_name set APP_DATABASE_URL=<your-database-url>
+   fly secrets --app app_name set GOOGLE_REDIRECT_URI="http://yourdomain.com/auth/google/callback"
+   fly secrets --app app_name set GOOGLE_CLIENT_ID="....."
+   fly secrets --app app_name set GOOGLE_CLIENT_SECRET="....."
+   ```
+
+5. Deploy the application.
 
    ```sh
    fly deploy
