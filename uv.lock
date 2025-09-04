@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.10, <3.13"
 resolution-markers = [
     "python_full_version >= '3.12' and sys_platform == 'darwin'",
@@ -884,16 +884,6 @@ wheels = [
 ]
 
 [[package]]
-name = "django-allauth"
-version = "65.10.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "asgiref" },
-    { name = "django" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/e1/9e/271e3b8ea27c089ddf3431140cf4aa86df86556ec102e360da5af62c3a99/django_allauth-65.10.0.tar.gz", hash = "sha256:47daa3b0e11a1d75724ea32995de37bd2b8963e9e4cce2b3a7fd64eb6d3b3c48", size = 1897777, upload-time = "2025-07-10T11:32:44.098Z" }
-
-[[package]]
 name = "django-celery-results"
 version = "2.6.0"
 source = { registry = "https://pypi.org/simple" }
@@ -966,17 +956,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/fa/d3/d7628a7a4899bf5aa
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7d/40/e556bc19ba65356fe5f0e48ca01c50e81f7c630042fa7411b6ab428ecf68/django_oauth_toolkit-3.0.1-py3-none-any.whl", hash = "sha256:3ef00b062a284f2031b0732b32dc899e3bbf0eac221bbb1cffcb50b8932e55ed", size = 77299, upload-time = "2024-09-07T14:08:43.225Z" },
 ]
-
-[[package]]
-name = "django-seed"
-version = "0.3.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "django" },
-    { name = "faker" },
-    { name = "toposort" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/5a/19/0423c1a8adb10c9e246f3a0e661165a7851bb7f4253eb338624081343e76/django-seed-0.3.1.tar.gz", hash = "sha256:93e65d2c10449c464b83e9031be02763ec10e786aa064d649c4dd5ad06fa0eea", size = 18336, upload-time = "2021-10-08T16:30:29.522Z" }
 
 [[package]]
 name = "django-tinymce"
@@ -1065,18 +1044,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/41/43/948d10bf42735709edb5ae51e23297d034086f17fc7279fef385a7acb473/fake_useragent-2.2.0.tar.gz", hash = "sha256:4e6ab6571e40cc086d788523cf9e018f618d07f9050f822ff409a4dfe17c16b2", size = 158898, upload-time = "2025-04-14T15:32:19.238Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/51/37/b3ea9cd5558ff4cb51957caca2193981c6b0ff30bd0d2630ac62505d99d0/fake_useragent-2.2.0-py3-none-any.whl", hash = "sha256:67f35ca4d847b0d298187443aaf020413746e56acd985a611908c73dba2daa24", size = 161695, upload-time = "2025-04-14T15:32:17.732Z" },
-]
-
-[[package]]
-name = "faker"
-version = "37.5.3"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "tzdata" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/ce/5d/7797a74e8e31fa227f0303239802c5f09b6722bdb6638359e7b6c8f30004/faker-37.5.3.tar.gz", hash = "sha256:8315d8ff4d6f4f588bd42ffe63abd599886c785073e26a44707e10eeba5713dc", size = 1907147, upload-time = "2025-07-30T15:52:19.528Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/4b/bf/d06dd96e7afa72069dbdd26ed0853b5e8bd7941e2c0819a9b21d6e6fc052/faker-37.5.3-py3-none-any.whl", hash = "sha256:386fe9d5e6132a915984bf887fcebcc72d6366a25dd5952905b31b141a17016d", size = 1949261, upload-time = "2025-07-30T15:52:17.729Z" },
 ]
 
 [[package]]
@@ -1238,14 +1205,12 @@ dependencies = [
     { name = "diskcache" },
     { name = "dj-rest-auth" },
     { name = "django" },
-    { name = "django-allauth" },
     { name = "django-celery-results" },
     { name = "django-cors-headers" },
     { name = "django-environ" },
     { name = "django-filter" },
     { name = "django-jsoneditor" },
     { name = "django-oauth-toolkit" },
-    { name = "django-seed" },
     { name = "django-tinymce" },
     { name = "djangorestframework" },
     { name = "docutils" },
@@ -1315,14 +1280,12 @@ requires-dist = [
     { name = "diskcache", specifier = ">=5.6.3" },
     { name = "dj-rest-auth", specifier = ">=6.0.0" },
     { name = "django", specifier = ">=5.1.1" },
-    { name = "django-allauth", specifier = ">=65.0.1" },
     { name = "django-celery-results", specifier = ">=2.6.0" },
     { name = "django-cors-headers", specifier = ">=4.4.0" },
     { name = "django-environ", specifier = ">=0.11.2" },
     { name = "django-filter", specifier = ">=24.3" },
     { name = "django-jsoneditor", specifier = ">=0.2.4" },
     { name = "django-oauth-toolkit", specifier = ">=3.0.1" },
-    { name = "django-seed", specifier = ">=0.3.1" },
     { name = "django-tinymce", specifier = ">=4.1.0" },
     { name = "djangorestframework", specifier = ">=3.15.2" },
     { name = "docutils", specifier = ">=0.21.2" },
@@ -4846,15 +4809,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/1c/9a/47c0449b98e6e7d1be6cbac02f93dd79003234ddc4aaab6ba07a9a7482e2/tomli-2.2.1-cp312-cp312-win32.whl", hash = "sha256:889f80ef92701b9dbb224e49ec87c645ce5df3fa2cc548664eb8a25e03127a98", size = 98875, upload-time = "2024-11-27T22:38:19.159Z" },
     { url = "https://files.pythonhosted.org/packages/ef/60/9b9638f081c6f1261e2688bd487625cd1e660d0a85bd469e91d8db969734/tomli-2.2.1-cp312-cp312-win_amd64.whl", hash = "sha256:7fc04e92e1d624a4a63c76474610238576942d6b8950a2d7f908a340494e67e4", size = 109418, upload-time = "2024-11-27T22:38:20.064Z" },
     { url = "https://files.pythonhosted.org/packages/6e/c2/61d3e0f47e2b74ef40a68b9e6ad5984f6241a942f7cd3bbfbdbd03861ea9/tomli-2.2.1-py3-none-any.whl", hash = "sha256:cb55c73c5f4408779d0cf3eef9f762b9c9f147a77de7b258bef0a5628adc85cc", size = 14257, upload-time = "2024-11-27T22:38:35.385Z" },
-]
-
-[[package]]
-name = "toposort"
-version = "1.10"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/69/19/8e955d90985ecbd3b9adb2a759753a6840da2dff3c569d412b2c9217678b/toposort-1.10.tar.gz", hash = "sha256:bfbb479c53d0a696ea7402601f4e693c97b0367837c8898bc6471adfca37a6bd", size = 11132, upload-time = "2023-02-27T13:59:51.834Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/f6/17/57b444fd314d5e1593350b9a31d000e7411ba8e17ce12dc7ad54ca76b810/toposort-1.10-py3-none-any.whl", hash = "sha256:cbdbc0d0bee4d2695ab2ceec97fe0679e9c10eab4b2a87a9372b929e70563a87", size = 8500, upload-time = "2023-02-25T20:07:06.538Z" },
 ]
 
 [[package]]

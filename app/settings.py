@@ -55,21 +55,15 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "rest_framework.authtoken",
     "drf_spectacular",
     "corsheaders",
-    "rest_framework.authtoken",
-    "dj_rest_auth",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "allauth.socialaccount.providers.github",
-    "oauth2_provider",
-    "user_org",
-    "common",
     "jsoneditor",
     "django_seed",
-    "video_gen",
     "django_celery_results",
+    "user_org",
+    "common",
+    "video_gen",
     "task_api",
 ]
 
@@ -84,7 +78,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "urls"
@@ -173,7 +166,6 @@ CSRF_TRUSTED_ORIGINS = os.environ.get(
     "CSRF_TRUSTED_ORIGINS", "http://localhost:8000"
 ).split(",")
 
-AUTHENTICATION_BACKENDS = ("allauth.account.auth_backends.AuthenticationBackend",)
 
 REST_USE_JWT = True  # Use JWT for authentication with dj-rest-auth
 SITE_ID = 1  # Set site ID
