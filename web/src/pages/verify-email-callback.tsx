@@ -79,7 +79,7 @@ export default function VerifyEmailCallback() {
               </div>
               <p className="text-center text-muted-foreground">
                 Your email has been successfully verified! You now have full
-                access to all DemoDrive features.
+                access to all {import.meta.env.VITE_PROJECT_NAME} features.
               </p>
             </CardContent>
             <div className="flex justify-center p-4">
@@ -120,7 +120,7 @@ export default function VerifyEmailCallback() {
             Email Verification
           </CardTitle>
           <CardDescription className="text-center text-muted-foreground pt-2">
-            Verifying your DemoDrive account
+            Verifying your {import.meta.env.VITE_PROJECT_NAME} account
           </CardDescription>
         </CardHeader>
         {renderContent()}

@@ -53,7 +53,7 @@ export function Sidebar() {
           <Link to="/" className="flex mx-auto items-center gap-2">
             <img
               src="/static/logo.svg"
-              alt="DemoDrive"
+              alt="Gestral"
               className="h-12 w-auto"
             />
             <h1
@@ -64,7 +64,7 @@ export function Sidebar() {
                   : "translate-x-0 opacity-100",
               )}
             >
-              DemoDrive
+              Gestral
             </h1>
           </Link>
           <Menu isOpen={getOpenState()} />

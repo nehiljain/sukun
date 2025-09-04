@@ -9,11 +9,11 @@ export default function Footer() {
             <Link to="/">
               <img
                 src="/static/logo.svg"
-                alt="DemoDrive"
+                alt={import.meta.env.VITE_PROJECT_NAME}
                 className="h-8 w-auto"
               />
             </Link>
-            <span className="text-xl font-semibold">Gestral</span>
+            <span className="text-xl font-semibold">{ import.meta.env.VITE_PROJECT_NAME}</span>
           </div>
           <nav className="flex flex-wrap justify-center md:justify-end gap-6">
             <Link to="mailto:team@19bits.com">Support</Link>
@@ -26,7 +26,7 @@ export default function Footer() {
           </nav>
         </div>
         <div className="mt-8 text-center text-sm text-gray-600">
-          © 2025 Gestral by 19Bits Inc. All rights reserved.
+          © 2025 { import.meta.env.VITE_PROJECT_NAME} by 19Bits Inc. All rights reserved.
         </div>
       </div>
     </footer>

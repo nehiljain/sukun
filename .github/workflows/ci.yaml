@@ -99,10 +99,10 @@ jobs:
       DOCKER_BUILDKIT: 1
       ENABLE_SIGNALING: false
       LOCAL_PROCESSING: true
-      AWS_STORAGE_BUCKET_NAME: demodrive-ci
+      AWS_STORAGE_BUCKET_NAME: gestral-ci
       AWS_REGION: us-west-1
-      SITE_URL: http://ci.demodrive.tech
-      ADMIN_EMAILS: selvam@demodrive.tech
+      SITE_URL: http://ci.gestral.tech
+      ADMIN_EMAILS: selvam@gestral.tech
     steps:
       - uses: actions/checkout@v4
 

@@ -25,7 +25,7 @@ export default function OnboardingPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
       <div className="mb-8">
-        <img src="/static/logo.svg" alt="DemoDrive" className="h-10 w-auto" />
+        <img src="/static/logo.svg" alt={import.meta.env.VITE_PROJECT_NAME} className="h-10 w-auto" />
       </div>
       <SignupFlow
         userId={user.id}

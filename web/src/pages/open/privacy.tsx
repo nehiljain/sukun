@@ -86,7 +86,7 @@ export const Privacy: React.FC = () => {
                   <p className="mb-4">
                     You have the right to delete your data at any time. To
                     request deletion of your account and associated data, please
-                    email us at privacy@demodrive.tech. We will process your
+                    email us at {import.meta.env.VITE_CONTACT_EMAIL}. We will process your
                     request within 30 days and confirm once completed. Note that
                     some information may be retained for legal or regulatory
                     requirements.
@@ -124,7 +124,7 @@ export const Privacy: React.FC = () => {
                   <h2 className="text-lg font-bold">10. Contact Information</h2>
                   <p className="mb-4">
                     For privacy-related inquiries or concerns, please contact us
-                    at founders@demodrive.tech.
+                    at {import.meta.env.VITE_CONTACT_EMAIL}.
                   </p>
 
                   <div className="text-sm text-gray-500 mt-8 text-center">

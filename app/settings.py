@@ -251,11 +251,11 @@ os.makedirs(BACKUP_DIR, exist_ok=True)
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-SITE_URL = os.environ.get("SITE_URL", "http://app.demodrive.tech")
+SITE_URL = os.environ.get("SITE_URL", "http://gestral.fly.dev")
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "DemoDrive API",
-    "DESCRIPTION": "DemoDrive API",
+    "TITLE": "Gestral API",
+    "DESCRIPTION": "Gestral API",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     # OTHER SETTINGS
