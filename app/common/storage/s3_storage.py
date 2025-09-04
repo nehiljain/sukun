@@ -35,7 +35,7 @@ class S3Storage(CloudStorageBase):
                 elif f"{self.bucket_name}.s3.amazonaws.com" in parsed_url.netloc:
                     file_path = path
                 elif "storage.googleapis.com" in parsed_url.netloc:
-                    file_path = path.replace("demodrive-media/", "", 1)
+                    file_path = path.replace("gestral-media/", "", 1)
                 else:
                     logger.warning(f"Unable to extract S3 key from URL: {file_path}")
                     file_path = path
@@ -173,11 +173,6 @@ class S3Storage(CloudStorageBase):
 
     def get_cdn_url(self, file_path: str) -> str:
         """Convert storage path or GCS URL to CDN URL"""
-        # Handle GCS URLs by extracting the path
-        gcs_prefix = "https://storage.googleapis.com/demodrive-media/"
-        if file_path.startswith(gcs_prefix):
-            file_path = file_path[len(gcs_prefix) :]
-
         normalized_path = self.normalize_path(file_path)
 
         if self.cdn_base_url:
@@ -200,8 +195,6 @@ class S3Storage(CloudStorageBase):
                     file_path = path
                 elif f"{self.bucket_name}.s3.amazonaws.com" in parsed_url.netloc:
                     file_path = path
-                elif "storage.googleapis.com" in parsed_url.netloc:
-                    file_path = path.replace("demodrive-media/", "", 1)
                 else:
                     logger.warning(f"Unable to extract S3 key from URL: {file_path}")
                     file_path = path

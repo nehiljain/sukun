@@ -40,7 +40,7 @@ const NameStep: React.FC<StepProps> = ({ onNext, defaultValue = "" }) => {
           </div>
         </div>
         <CardTitle className="text-2xl text-center">
-          Welcome to DemoDrive!
+          Welcome to {import.meta.env.VITE_PROJECT_NAME}!
         </CardTitle>
         <CardDescription className="text-center text-muted-foreground pt-2">
           Let's get you set up. What's your name?

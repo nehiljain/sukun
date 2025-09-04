@@ -223,7 +223,7 @@ export const Terms: React.FC = () => {
                   <h2 className="text-lg font-bold">15. Contact Us</h2>
                   <p className="mb-4">
                     If you have any questions about these Terms, please contact
-                    us at founders@demodrive.tech.
+                    us at {import.meta.env.VITE_CONTACT_EMAIL}.
                   </p>
 
                   <div className="text-sm text-gray-500 mt-8 text-center">

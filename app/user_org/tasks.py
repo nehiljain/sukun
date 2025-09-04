@@ -30,9 +30,9 @@ def send_user_sign_up_email(self, user_id, verification_url):
         }
 
         params = {
-            "from": "no-reply <noreply@demodrive.tech>",
+            "from": "no-reply <noreply@gestral.tech>",
             "to": [app_user.user.email],
-            "subject": "Verify your DemoDrive account",
+            "subject": "Verify your Gestral account",
         }
 
         send_email(context, template_path, params)

@@ -8,7 +8,7 @@ jobs:
     env:
       PYTHONUNBUFFERED: 1
       ENVIRONMENT: prod
-      PROJECT_NAME: demodrive
+      PROJECT_NAME: gestral
 
     steps:
 
