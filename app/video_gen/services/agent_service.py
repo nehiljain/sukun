@@ -75,31 +75,6 @@ class OpenAIAgentService:
             func=self._tool_show_render_preview,
         )
 
-        # self.register_tool(
-        #     name="start_new_render",
-        #     description="Start a new video rendering process",
-        #     parameters={
-        #         "type": "object",
-        #         "properties": {
-        #             "project_id": {
-        #                 "type": "string",
-        #                 "description": "The ID of the video project",
-        #             },
-        #             "quality": {
-        #                 "type": "string",
-        #                 "description": "Rendering quality (draft, preview, final)",
-        #                 "enum": ["draft", "preview", "final"],
-        #             },
-        #             "notes": {
-        #                 "type": "string",
-        #                 "description": "Optional notes about this render",
-        #             },
-        #         },
-        #         "required": ["project_id", "quality"],
-        #     },
-        #     func=self._tool_start_new_render,
-        # )
-
     def register_tool(
         self, name: str, description: str, parameters: Dict, func: Callable
     ):
@@ -199,58 +174,6 @@ class OpenAIAgentService:
         except Exception as e:
             logger.exception(f"Error getting render preview: {e}")
             return {"status": "error", "message": str(e)}
-
-    # def _tool_start_new_render(
-    #     self, project_id: str, quality: str, notes: str = None
-    # ) -> Dict:
-    #     """Tool implementation: Start a new render"""
-    #     try:
-    #         project = VideoProject.objects.get(id=project_id)
-
-    #         # Validate project has state data required for rendering
-    #         if not project.state:
-    #             return {
-    #                 "status": "error",
-    #                 "message": "Project doesn't have any state data required for rendering",
-    #             }
-
-    #         # Map quality to render settings
-    #         quality_settings = {
-    #             "draft": {"width": 640, "height": 360, "fps": 24, "bitrate": "1M"},
-    #             "preview": {"width": 1280, "height": 720, "fps": 30, "bitrate": "5M"},
-    #             "final": {"width": 1920, "height": 1080, "fps": 30, "bitrate": "8M"},
-    #         }
-
-    #         settings = quality_settings.get(quality, quality_settings["preview"])
-
-    #         # Create render job
-    #         render_service = RenderService()
-    #         render_video = render_service.create_render_job(
-    #             video_project=project,
-    #             render_settings={
-    #                 "width": settings["width"],
-    #                 "height": settings["height"],
-    #                 "fps": settings["fps"],
-    #                 "bitrate": settings["bitrate"],
-    #                 "format": "mp4",
-    #             },
-    #             notes=notes or f"Render initiated by AI assistant ({quality} quality)",
-    #         )
-
-    #         # Start the rendering process (this would typically be async)
-    #         render_service.start_render_job(render_video.id)
-
-    #         return {
-    #             "status": "success",
-    #             "message": f"New render job created with {quality} quality",
-    #             "render_id": str(render_video.id),
-    #         }
-
-    #     except VideoProject.DoesNotExist:
-    #         return {"status": "error", "message": "Project not found"}
-    #     except Exception as e:
-    #         logger.exception(f"Error starting new render: {e}")
-    #         return {"status": "error", "message": str(e)}
 
     def process_message(self, project: VideoProject, user_message: str) -> ChatMessage:
         """Process a user message and return the agent's response"""

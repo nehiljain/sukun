@@ -59,7 +59,6 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "corsheaders",
     "jsoneditor",
-    "django_seed",
     "django_celery_results",
     "user_org",
     "common",
