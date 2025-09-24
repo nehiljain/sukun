@@ -26,6 +26,9 @@ import MediaLibrary from "@/pages/medias/media-library";
 import RenderVideoPage from "@/pages/video/render-video";
 import MediaEntry from "@/pages/medias/media-entry";
 
+// Gmail Integration Pages
+import GmailDashboard from "@/pages/gmail-dashboard";
+
 export function AppRouter() {
   return (
     <Routes>
@@ -55,6 +58,7 @@ export function AppRouter() {
           element={<RenderVideoPage />}
         />
         <Route path="/medias/:media_id" element={<MediaEntry />} />
+        <Route path="/gmail" element={<GmailDashboard />} />
       </Route>
       {/* 404 route - must be last to catch all unmatched routes */}
       <Route path="*" element={<NotFound />} />

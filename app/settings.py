@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "common",
     "video_gen",
     "task_api",
+    "gmail_integration",
 ]
 
 MIDDLEWARE = [
