@@ -2,22 +2,46 @@ from django.db import models
 from user_org.models import AppUser
 
 
+class GmailOAuthState(models.Model):
+    """Store temporary OAuth state for Gmail authentication"""
+
+    state = models.CharField(max_length=32, unique=True)
+    user = models.ForeignKey(
+        AppUser, on_delete=models.CASCADE, related_name="gmail_oauth_states"
+    )
+    expires_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "gmail_oauth_states"
+        indexes = [
+            models.Index(fields=["state"]),
+            models.Index(fields=["expires_at"]),
+        ]
+
+
 class GmailToken(models.Model):
     """Store Gmail-specific OAuth tokens for each user"""
-    user = models.OneToOneField(AppUser, on_delete=models.CASCADE, related_name='gmail_token')
+
+    user = models.OneToOneField(
+        AppUser, on_delete=models.CASCADE, related_name="gmail_token"
+    )
     access_token = models.TextField()
     refresh_token = models.TextField(blank=True, null=True)
     token_expires_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
-        db_table = 'gmail_tokens'
+        db_table = "gmail_tokens"
 
 
 class GmailMessage(models.Model):
     """Cache Gmail messages for faster access"""
-    user = models.ForeignKey(AppUser, on_delete=models.CASCADE, related_name='gmail_messages')
+
+    user = models.ForeignKey(
+        AppUser, on_delete=models.CASCADE, related_name="gmail_messages"
+    )
     message_id = models.CharField(max_length=255, unique=True)
     thread_id = models.CharField(max_length=255)
     subject = models.TextField(blank=True)
@@ -29,11 +53,11 @@ class GmailMessage(models.Model):
     received_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
-        db_table = 'gmail_messages'
+        db_table = "gmail_messages"
         indexes = [
-            models.Index(fields=['user', 'is_important']),
-            models.Index(fields=['user', 'is_archived']),
-            models.Index(fields=['received_at']),
+            models.Index(fields=["user", "is_important"]),
+            models.Index(fields=["user", "is_archived"]),
+            models.Index(fields=["received_at"]),
         ]

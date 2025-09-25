@@ -4,25 +4,24 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('gmail_integration', '0001_initial'),
+        ("gmail_integration", "0001_initial"),
     ]
 
     operations = [
         migrations.RenameIndex(
-            model_name='gmailmessage',
-            new_name='gmail_messa_user_id_6ef690_idx',
-            old_name='gmail_messages_user_important_idx',
+            model_name="gmailmessage",
+            new_name="gmail_messa_user_id_6ef690_idx",
+            old_name="gmail_messages_user_important_idx",
         ),
         migrations.RenameIndex(
-            model_name='gmailmessage',
-            new_name='gmail_messa_user_id_960b7a_idx',
-            old_name='gmail_messages_user_archived_idx',
+            model_name="gmailmessage",
+            new_name="gmail_messa_user_id_960b7a_idx",
+            old_name="gmail_messages_user_archived_idx",
         ),
         migrations.RenameIndex(
-            model_name='gmailmessage',
-            new_name='gmail_messa_receive_4c8a75_idx',
-            old_name='gmail_messages_received_at_idx',
+            model_name="gmailmessage",
+            new_name="gmail_messa_receive_4c8a75_idx",
+            old_name="gmail_messages_received_at_idx",
         ),
     ]

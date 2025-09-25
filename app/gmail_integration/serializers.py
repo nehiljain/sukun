@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import GmailMessage
 
 
@@ -6,11 +7,19 @@ class GmailMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = GmailMessage
         fields = [
-            'id', 'message_id', 'thread_id', 'subject', 'sender', 
-            'snippet', 'is_important', 'is_archived', 'labels', 
-            'received_at', 'created_at'
+            "id",
+            "message_id",
+            "thread_id",
+            "subject",
+            "sender",
+            "snippet",
+            "is_important",
+            "is_archived",
+            "labels",
+            "received_at",
+            "created_at",
         ]
-        read_only_fields = ['id', 'created_at']
+        read_only_fields = ["id", "created_at"]
 
 
 class GmailDraftSerializer(serializers.Serializer):

@@ -9,6 +9,7 @@ import { TemplateDetailsTray } from "@/components/dashboard/TemplateDetailsTray"
 import VerificationBanner from "@/components/auth/VerificationBanner";
 import VideoPreviewTile from "@/components/VideoPreviewTile";
 import VideoTile from "@/components/VideoTile";
+import { GmailDashboardCard } from "@/components/gmail/GmailDashboardCard";
 import { ddApiClient } from "@/lib/api-client";
 
 export default function Dashboard() {
@@ -62,6 +63,11 @@ export default function Dashboard() {
           <p className="text-foreground mt-2">
             To get started, click on a template.
           </p>
+        </div>
+
+        {/* Gmail Integration Card */}
+        <div className="mb-8">
+          <GmailDashboardCard />
         </div>
 
         {/* Quick Actions Grid */}
