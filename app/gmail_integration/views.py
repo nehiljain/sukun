@@ -15,6 +15,7 @@ from user_org.models import AppUser
 from .models import GmailToken
 from .serializers import GmailDraftSerializer, GmailMessageSerializer
 from .services import GmailService
+from .tasks import search_and_export_emails
 
 logger = logging.getLogger(__name__)
 
@@ -210,24 +211,30 @@ class GmailTestView(APIView):
 
             # Get the 5 most recent emails from inbox
             messages = gmail_service.get_messages(query="is:actionable", max_results=5)
-            
+
             # Format for easy reading
             formatted_messages = []
             for msg in messages:
-                formatted_messages.append({
-                    "subject": msg["subject"],
-                    "sender": msg["sender"],
-                    "snippet": msg["snippet"][:100] + "..." if len(msg["snippet"]) > 100 else msg["snippet"],
-                    "received_at": msg["received_at"].strftime("%Y-%m-%d %H:%M:%S"),
-                    "is_important": msg["is_important"]
-                })
+                formatted_messages.append(
+                    {
+                        "subject": msg["subject"],
+                        "sender": msg["sender"],
+                        "snippet": msg["snippet"][:100] + "..."
+                        if len(msg["snippet"]) > 100
+                        else msg["snippet"],
+                        "received_at": msg["received_at"].strftime("%Y-%m-%d %H:%M:%S"),
+                        "is_important": msg["is_important"],
+                    }
+                )
 
-            return Response({
-                "status": "success",
-                "user_email": app_user.user.email,
-                "message_count": len(formatted_messages),
-                "recent_emails": formatted_messages
-            })
+            return Response(
+                {
+                    "status": "success",
+                    "user_email": app_user.user.email,
+                    "message_count": len(formatted_messages),
+                    "recent_emails": formatted_messages,
+                }
+            )
 
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -369,5 +376,151 @@ class GmailImportantView(APIView):
             logger.error(f"Error updating message importance: {e}")
             return Response(
                 {"error": "Failed to update message importance"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class GmailExportView(APIView):
+    """Export Gmail emails as JSON files"""
+
+    @method_decorator(login_required)
+    def post(self, request):
+        try:
+            app_user = AppUser.objects.get(user=request.user)
+
+            # Validate request data
+            search_query = request.data.get("search_query", "").strip()
+            max_results = request.data.get("max_results", 100)
+
+            if not search_query:
+                return Response(
+                    {"error": "Search query is required"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Validate max_results
+            try:
+                max_results = int(max_results)
+                if max_results <= 0 or max_results > 500:
+                    return Response(
+                        {"error": "max_results must be between 1 and 500"},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+            except (ValueError, TypeError):
+                return Response(
+                    {"error": "max_results must be a valid number"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Check if user has Gmail token
+            try:
+                GmailToken.objects.get(user=app_user)
+            except GmailToken.DoesNotExist:
+                return Response(
+                    {
+                        "error": "Gmail not connected. Please connect your Gmail account first."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Generate export ID
+            import uuid
+
+            export_id = str(uuid.uuid4())
+
+            # Start the background task
+            task = search_and_export_emails.delay(
+                user_id=app_user.id,
+                search_query=search_query,
+                max_results=max_results,
+                export_id=export_id,
+            )
+
+            logger.info(
+                f"Started email export task {task.id} for user {app_user.id}, query: {search_query}"
+            )
+
+            return Response(
+                {
+                    "message": "Email export started successfully",
+                    "task_id": task.id,
+                    "export_id": export_id,
+                    "search_query": search_query,
+                    "max_results": max_results,
+                    "status_url": f"/api/gmail/export/status/{task.id}/",
+                },
+                status=status.HTTP_202_ACCEPTED,
+            )
+
+        except AppUser.DoesNotExist:
+            return Response(
+                {"error": "User profile not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            logger.error(f"Error starting email export: {e}")
+            return Response(
+                {"error": "Failed to start email export"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class GmailExportStatusView(APIView):
+    """Check status of Gmail export task"""
+
+    @method_decorator(login_required)
+    def get(self, request, task_id):
+        try:
+            from celery.result import AsyncResult
+
+            # Get task result
+            task_result = AsyncResult(task_id)
+
+            if task_result.state == "PENDING":
+                response_data = {
+                    "task_id": task_id,
+                    "status": "PENDING",
+                    "message": "Task is waiting to be processed",
+                }
+            elif task_result.state == "PROGRESS":
+                response_data = {
+                    "task_id": task_id,
+                    "status": "PROGRESS",
+                    "message": task_result.info.get("status", "Processing..."),
+                    "progress": task_result.info.get("progress", 0),
+                    "current": task_result.info.get("current", 0),
+                    "total": task_result.info.get("total", 0),
+                }
+            elif task_result.state == "SUCCESS":
+                result = task_result.result
+                response_data = {
+                    "task_id": task_id,
+                    "status": "SUCCESS",
+                    "message": result.get("message", "Export completed successfully"),
+                    "export_id": result.get("export_id"),
+                    "export_dir": result.get("export_dir"),
+                    "email_count": result.get("email_count", 0),
+                    "files": result.get("files", []),
+                    "summary_file": result.get("summary_file"),
+                }
+            elif task_result.state == "FAILURE":
+                response_data = {
+                    "task_id": task_id,
+                    "status": "FAILURE",
+                    "message": "Export failed",
+                    "error": str(task_result.info),
+                }
+            else:
+                response_data = {
+                    "task_id": task_id,
+                    "status": task_result.state,
+                    "message": "Unknown task state",
+                }
+
+            return Response(response_data)
+
+        except Exception as e:
+            logger.error(f"Error checking export status: {e}")
+            return Response(
+                {"error": "Failed to check export status"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )

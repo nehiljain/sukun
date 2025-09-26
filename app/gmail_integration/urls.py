@@ -23,4 +23,11 @@ urlpatterns = [
         views.GmailImportantView.as_view(),
         name="gmail_important",
     ),
+    # Gmail Export endpoints
+    path("api/gmail/export", views.GmailExportView.as_view(), name="gmail_export"),
+    path(
+        "api/gmail/export/status/<str:task_id>/",
+        views.GmailExportStatusView.as_view(),
+        name="gmail_export_status",
+    ),
 ]

@@ -63,7 +63,7 @@ class GmailService:
     def get_messages(
         self, query: str = "is:inbox", max_results: int = 50
     ) -> List[Dict]:
-        """Get messages from Gmail"""
+        """Get messages from Gmail with full message content"""
         try:
             # Get message list
             results = (
@@ -77,32 +77,69 @@ class GmailService:
             detailed_messages = []
 
             for message in messages:
-                # Get full message details
+                # Get full message details with all parts
                 msg_detail = (
                     self.service.users()
                     .messages()
-                    .get(userId="me", id=message["id"])
+                    .get(
+                        userId="me",
+                        id=message["id"],
+                        format="full",  # Get full message content
+                    )
                     .execute()
                 )
 
-                # Extract relevant information
+                # Extract all headers
                 headers = msg_detail["payload"].get("headers", [])
-                subject = next(
-                    (h["value"] for h in headers if h["name"] == "Subject"), ""
-                )
-                sender = next((h["value"] for h in headers if h["name"] == "From"), "")
+                header_dict = {h["name"]: h["value"] for h in headers}
 
                 # Parse sender email
+                sender = header_dict.get("From", "")
                 sender_email = (
                     sender.split("<")[-1].split(">")[0].strip()
                     if "<" in sender
                     else sender
                 )
 
+                # Extract full message content
+                full_content = self._extract_message_content(msg_detail["payload"])
+
                 message_data = {
                     "message_id": message["id"],
                     "thread_id": message["threadId"],
-                    "subject": subject,
+                    "subject": header_dict.get("Subject", ""),
+                    "sender": sender_email,
+                    "sender_name": sender.split("<")[0].strip()
+                    if "<" in sender
+                    else "",
+                    "to": header_dict.get("To", ""),
+                    "cc": header_dict.get("Cc", ""),
+                    "bcc": header_dict.get("Bcc", ""),
+                    "reply_to": header_dict.get("Reply-To", ""),
+                    "message_id_header": header_dict.get("Message-ID", ""),
+                    "references": header_dict.get("References", ""),
+                    "in_reply_to": header_dict.get("In-Reply-To", ""),
+                    "date": header_dict.get("Date", ""),
+                    "snippet": msg_detail.get("snippet", ""),
+                    "labels": msg_detail.get("labelIds", []),
+                    "received_at": datetime.fromtimestamp(
+                        int(msg_detail["internalDate"]) / 1000
+                    ),
+                    "is_important": "IMPORTANT" in msg_detail.get("labelIds", []),
+                    "is_archived": "INBOX" not in msg_detail.get("labelIds", []),
+                    "size_estimate": msg_detail.get("sizeEstimate", 0),
+                    "history_id": msg_detail.get("historyId", ""),
+                    "raw_headers": headers,  # All headers as array
+                    "full_content": full_content,  # Complete message content
+                }
+
+                detailed_messages.append(message_data)
+
+                # Cache message in database (basic info only for performance)
+                basic_message_data = {
+                    "message_id": message["id"],
+                    "thread_id": message["threadId"],
+                    "subject": header_dict.get("Subject", ""),
                     "sender": sender_email,
                     "snippet": msg_detail.get("snippet", ""),
                     "labels": msg_detail.get("labelIds", []),
@@ -113,11 +150,10 @@ class GmailService:
                     "is_archived": "INBOX" not in msg_detail.get("labelIds", []),
                 }
 
-                detailed_messages.append(message_data)
-
-                # Cache message in database
                 GmailMessage.objects.update_or_create(
-                    user=self.user, message_id=message["id"], defaults=message_data
+                    user=self.user,
+                    message_id=message["id"],
+                    defaults=basic_message_data,
                 )
 
             return detailed_messages
@@ -212,3 +248,62 @@ class GmailService:
         except HttpError as e:
             logger.error(f"Error marking message {message_id} as important: {e}")
             return False
+
+    def _extract_message_content(self, payload: Dict) -> Dict:
+        """Extract full message content from all parts"""
+        import base64
+
+        content = {"text_plain": "", "text_html": "", "attachments": [], "parts": []}
+
+        def extract_part_content(part: Dict, part_id: str = ""):
+            """Recursively extract content from message parts"""
+            mime_type = part.get("mimeType", "")
+            filename = part.get("filename", "")
+
+            part_data = {
+                "part_id": part_id,
+                "mime_type": mime_type,
+                "filename": filename,
+                "headers": part.get("headers", []),
+                "body_size": part.get("body", {}).get("size", 0),
+                "content": "",
+            }
+
+            # Extract body content if present
+            body = part.get("body", {})
+            if body.get("data"):
+                try:
+                    # Decode base64url encoded content
+                    decoded_data = base64.urlsafe_b64decode(body["data"] + "===")
+                    part_data["content"] = decoded_data.decode("utf-8", errors="ignore")
+                except Exception as e:
+                    logger.warning(f"Error decoding part content: {e}")
+                    part_data["content"] = ""
+
+            # Handle different MIME types
+            if mime_type == "text/plain":
+                content["text_plain"] += part_data["content"]
+            elif mime_type == "text/html":
+                content["text_html"] += part_data["content"]
+            elif mime_type.startswith("multipart/"):
+                # Handle multipart messages
+                for i, subpart in enumerate(part.get("parts", [])):
+                    subpart_id = f"{part_id}.{i + 1}" if part_id else str(i + 1)
+                    extract_part_content(subpart, subpart_id)
+            elif filename:
+                # This is an attachment
+                attachment_data = {
+                    "filename": filename,
+                    "mime_type": mime_type,
+                    "size": body.get("size", 0),
+                    "attachment_id": body.get("attachmentId", ""),
+                    "part_id": part_id,
+                }
+                content["attachments"].append(attachment_data)
+
+            content["parts"].append(part_data)
+
+        # Extract content from the main payload
+        extract_part_content(payload, "0")
+
+        return content

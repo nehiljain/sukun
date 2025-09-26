@@ -27,6 +27,8 @@ Icon
 
 # data
 data/
+app/data/
+web/data/
 *.csv
 *.parquet
 
